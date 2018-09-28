@@ -1,0 +1,65 @@
+img.post{
+	width:100%;
+	max-width:150px;
+	max-height: 512px;
+}
+body{
+	background-color:#EEF2FF;
+}
+div.postreply{
+	width: 30%;
+	background-color: #b7c5d9;
+	border-spacing:0;
+	color: #000;
+	font-family: arial,helvetica,sans-serif;
+	font-size: 10pt;
+}
+div.op{
+	 position:relative;
+ 	 top:-5px;
+	 vertical-align: super;
+	 border-spacing:0;
+	 color: #000;
+	 font-family: arial,helvetica,sans-serif;
+	 font-size: 10pt;
+}
+div.postfront{
+	background-color: #b7c5d9;
+	border-spacing:0;
+	color: #000;
+	font-family: arial,helvetica,sans-serif;
+	font-size: 12pt;
+	margin: 5px;
+	padding: 3px;
+}
+img.header {
+    display: block;
+    margin: 0 auto;
+}
+span.name {
+	color: #117743;
+	font-weight: 700;
+	vertical-align:top; 
+	font-size: 10pt;
+}
+span.frontname {
+	color: #117743;
+	font-weight: 700;
+	vertical-align:top; 
+	font-size: 12pt;
+}
+span.text{
+	vertical-align:top; 
+	font-size: 10pt;
+}
+span.fronttext{
+	vertical-align:top; 
+	font-size: 12pt;
+}
+span.imagedesc{
+	vertical-align:top;
+	font-size: 8pt;
+}
+td.info{
+	vertical-align:top;
+}
