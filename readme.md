@@ -3,7 +3,7 @@ Work in Progress
 
 Imageboard software designed to be very minimal
 
-## To do ##
+## To do: ##
  *Actually put comments on code
  *Fix bug regarding image headers
  *Double check everything
