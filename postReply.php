@@ -61,7 +61,7 @@ else {
         else {
             $temp = explode(".", $_FILES["image"]["name"]);
             $newfilename = round(microtime(true)) . '.' . end($temp);
-            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  . $newfilename)) {
+            if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
                 $oldfilename = $_FILES["image"]["name"];
                 $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, replyTo, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$replyTo', '$ip')");
                 $sql->execute() or die(mysqli_error($conn));
