@@ -126,10 +126,10 @@ EOT;
 							$username = $row['name'];			
 						}
 						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
-						if (!is_null($row["replyTo"])){
+						if ((!is_null($row["replyto"])) && ($row["replyto"] != 0)){
 							echo "<br><span class='text'><a id='reply' style='color:#FF0000;margin:0;' href='#' onclick='document.getElementById('".$row["replyto"]."').scrollIntoView();'> >>".$row["replyto"]."</a>";
 						}
-						if ($row["replyTo"] == 0){
+						if (($row["replyto"]) == 0){
 							echo "<br><span class='text'>";
 						}
 						echo "<br>". $row["comment"]."</span>";
