@@ -44,8 +44,6 @@ EOT;
 EOT;
 		echo "<input type='hidden' name='thread' value='".$thread."'>";
 		echo <<<EOT
-												
-												<tr><td>Reply to:</td><td><input name="replyTo" type="text"></td></tr>
 												<tr><td>Name:</td><td><input name="username" value="Anonymous" type="text"></td></tr>
 												<td>Reply:</td><td><textarea name="comment"></textarea></td></tr>
 												
@@ -128,8 +126,11 @@ EOT;
 							$username = $row['name'];			
 						}
 						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
-						if (!is_null($row["replyto"])){
+						if (!is_null($row["replyTo"])){
 							echo "<br><span class='text'><a id='reply' style='color:#FF0000;margin:0;' href='#' onclick='document.getElementById('".$row["replyto"]."').scrollIntoView();'> >>".$row["replyto"]."</a>";
+						}
+						if ($row["replyTo"] == 0){
+							echo "<br><span class='text'>";
 						}
 						echo "<br>". $row["comment"]."</span>";
 						echo "</td>";

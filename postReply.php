@@ -3,7 +3,7 @@ date_default_timezone_set("America/Los Angeles");
 
 $config = parse_ini_file('conf/config.ini');
 $time = time();
-$replyTo = $_POST["replyTo"];
+$reply = 0;
 $topic = (int)$_POST["topic"];
 $thread = (int)$_POST["thread"];
 $username = $POST["username"];
@@ -27,6 +27,9 @@ if (!isset($_POST['username'])){
 }
 else {
     if ($_FILES['image']['error'] == 4) {
+        if ($reply == 0) {
+            $replyTo = 0;
+        }
         $sql = $conn->prepare("INSERT INTO POSTS (time, name, comment, reply, replyTo, ip) VALUES ('$time', '$username', '$comment', '$thread', '$replyTo', '$ip')");
         $sql->execute() or die(mysqli_error($conn));
         echo ("Reply Submitted.");
@@ -63,7 +66,10 @@ else {
             $newfilename = round(microtime(true)) . '.' . end($temp);
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
                 $oldfilename = $_FILES["image"]["name"];
-                $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, replyTo, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$replyTo', '$ip')");
+                if ($reply == 0){
+                    $replyTo = 0;
+                }
+                $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, replyto, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$replyTo', '$ip')");
                 $sql->execute() or die(mysqli_error($conn));
                 $conn->close();
                 echo "The reply with the file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
