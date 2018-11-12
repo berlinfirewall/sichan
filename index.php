@@ -4,8 +4,9 @@
     $boardImage = $config['boardImage'];
     $headerDir = $config['headerDir'];
     $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
-	$sql = "SELECT * FROM POSTS WHERE reply IS NULL AND replyTo IS NULL ORDER BY time DESC";
+	$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC";
 	$result = $conn->query($sql);
+		echo $config['isImage'];
  		echo "<html>";	
         echo "<head>";	
 		echo "<title>".$config['boardName']."</title>";
@@ -14,10 +15,10 @@
 			</head>				
 			<body>
 EOT;
-		if ($config['isImage'] === "yes"){
+		if ($config['isImage'] = 1){
 			echo "<img class='header' src='".$headerDir."/".$boardImage."'>";
 		}
-		else{
+		if ($config['isImage'] = 0){
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
 		}
 		echo <<<EOT

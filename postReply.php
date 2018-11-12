@@ -30,7 +30,7 @@ else {
         if ($reply == 0) {
             $replyTo = 0;
         }
-        $sql = $conn->prepare("INSERT INTO POSTS (time, name, comment, reply, replyTo, ip) VALUES ('$time', '$username', '$comment', '$thread', '$replyTo', '$ip')");
+        $sql = $conn->prepare("INSERT INTO POSTS (time, name, comment, reply, ip) VALUES ('$time', '$username', '$comment', '$thread', '$ip')");
         $sql->execute() or die(mysqli_error($conn));
         echo ("Reply Submitted.");
         $conn->close();
@@ -66,10 +66,7 @@ else {
             $newfilename = round(microtime(true)) . '.' . end($temp);
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
                 $oldfilename = $_FILES["image"]["name"];
-                if ($reply == 0){
-                    $replyTo = 0;
-                }
-                $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, replyto, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$replyTo', '$ip')");
+                $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip')");
                 $sql->execute() or die(mysqli_error($conn));
                 $conn->close();
                 echo "The reply with the file ". basename( $_FILES["image"]["name"]). " has been uploaded.";

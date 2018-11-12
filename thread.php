@@ -126,13 +126,26 @@ EOT;
 							$username = $row['name'];			
 						}
 						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
-						if ((!is_null($row["replyto"])) && ($row["replyto"] != 0)){
-							echo "<br><span class='text'><a id='reply' style='color:#FF0000;margin:0;' href='#' onclick='document.getElementById('".$row["replyto"]."').scrollIntoView();'> >>".$row["replyto"]."</a>";
+
+						if (preg_match('/[\x3E\x3E]/', $row["comment"])){
+    						$splitString = preg_split('/([\x3e\x3e]+\d+)/', $row["comment"], -1, PREG_SPLIT_DELIM_CAPTURE);
+  							$splitNumber = count($splitString);
+							echo "<br>";
+							for ($i = 0; $i <= $splitNumber; $i++){
+        						if (preg_match('/[\x3E\x3E]/', $splitString[$i])){
+									preg_match_all('!\d+!', $splitString, $postnum);
+									echo "<br><span class='text'><a id='reply' style='color:#FF0000;margin:0;' href='#' onclick='document.getElementById('"."$postnum"."').scrollIntoView();>"."$splitString[$i]"."</a>";
+            						print "<span>" . "" . "</b>\n";
+        						}
+        						else {
+            						print "$splitString[$i]\n";
+        						}
+    						}
+							echo "</span>";
 						}
-						if (($row["replyto"]) == 0){
-							echo "<br><span class='text'>";
+						else {
+							echo "<br>". $row["comment"]."</span>";
 						}
-						echo "<br>". $row["comment"]."</span>";
 						echo "</td>";
 						echo "</tr>";
 						echo "</table>";
