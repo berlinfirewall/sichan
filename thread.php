@@ -18,7 +18,7 @@ else
         echo "<head>";	
 		echo "<title>".$config['boardName']."</title>";
 		echo <<<EOT
-				<link rel="stylesheet" type="text/css" href="/index.css">
+				<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 			</head>				
 			<body>
 				<table style="width:100%;height:100%;"cellspacing="0" cellpadding=4">
@@ -88,7 +88,7 @@ EOT;
 					}
                     echo "<span class='name'>".$opusername."</span> ";
 					echo date('m/d/Y h:m:s', $row["time"]);
-					echo "<br><span style='font-size: 10pt;'>". $row["comment"]."</span></td>";
+					echo "<br><span class='text'>". $row["comment"]."</span></td>";
 					echo "</tr>";
 					echo "</table>";
 					echo "</div>";
@@ -144,7 +144,7 @@ EOT;
 							echo "</span>";
 						}
 						else {
-							echo "<br>". $row["comment"]."</span>";
+							echo "<br><span class='text'>". $row["comment"]."</span>";
 						}
 						echo "</td>";
 						echo "</tr>";
@@ -159,6 +159,21 @@ EOT;
 echo <<<EOT
 						</tbody>
 					</table>
+					<div align="center">
+					<div>
+  						<button id="default">Default</button>
+  						<button id="dark">Dark</button>
+					</div> 
+					<script>
+						
+						document.getElementById('default').onclick = function () {
+							document.getElementById('theme_css').href = '/default.css';
+						};
+						document.getElementById('dark').onclick = function () { 
+    						document.getElementById('theme_css').href = '/dark.css';
+						};
+					</script>
+					</div>
 				</body>	
 			</html>
 EOT;

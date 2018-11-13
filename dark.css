@@ -1,0 +1,84 @@
+img.post{
+	width:100%;
+	max-width:150px;
+	max-height: 512px;
+}
+body{
+	background-color:#1e1e1e;
+}
+div.postreply{
+	width: 30%;
+	background-color: #333333;
+	border-spacing:0;
+	color: #999999;
+	font-family: arial,helvetica,sans-serif;
+	font-size: 10pt;
+}
+textarea{
+	background: #333333;
+	color: #CCCCCC;
+	border: #666666 1px solid;
+}
+input {
+	background: #333333;
+	color: #CCCCCC;
+	border: #666666 1px solid;
+}
+div.op{
+	 position:relative;
+ 	 top:-5px;
+	 vertical-align: super;
+	 border-spacing:0;
+	 color: #1e1e1e;
+	 font-family: arial,helvetica,sans-serif;
+	 font-size: 10pt;
+}
+div.postfront{
+	background-color: #333333;
+	border-spacing:0;
+	color: #999999;
+	font-family: arial,helvetica,sans-serif;
+	font-size: 12pt;
+	margin: 5px;
+	padding: 3px;
+}
+img.header {
+    display: block;
+    margin: 0 auto;
+}
+span.name {
+	color: #32dd72;
+	font-weight: 700;
+	vertical-align:top; 
+	font-size: 10pt;
+}
+span.frontname {
+	color: #32dd72;
+	font-weight: 700;
+	vertical-align:top; 
+	font-size: 12pt;
+}
+span.text{
+	vertical-align:top; 
+	font-size: 10pt;
+	color: #999999;
+}
+span.fronttext{
+	vertical-align:top;
+	color: #999999;
+	font-size: 12pt;
+}
+span.imagedesc{
+	vertical-align:top;
+	font-size: 8pt;
+}
+td.info{
+	vertical-align:top;
+}
+h1.header{
+	text-align: center;
+	font-family: arial,helvetica,sans-serif;
+}
+a {
+	color: #999999;
+}

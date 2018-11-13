@@ -11,7 +11,7 @@
         echo "<head>";	
 		echo "<title>".$config['boardName']."</title>";
 		echo <<<EOT
-			<link rel="stylesheet" type="text/css" href="/index.css">
+			<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 			</head>				
 			<body>
 EOT;
@@ -70,7 +70,7 @@ EOT;
 							$username = $row['name'];			
 						}
 						echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
-						echo "<br>". $row["comment"]."</span>";
+						echo "<br><span class='fronttext'>". $row["comment"]."</span>";
 						echo "<br><br>";
 						echo "<a href='http://".$config['url']."/thread.php?id=".$row["id"]."'>View Thread</a>";
 						echo "</td>";
@@ -82,6 +82,21 @@ EOT;
 echo <<<EOL
 						</tbody>
 					</table>
+					<div align="center">
+					<div>
+  						<button id="default">Default</button>
+  						<button id="dark">Dark</button>
+					</div> 
+					<script>
+						
+						document.getElementById('default').onclick = function () {
+							document.getElementById('theme_css').href = '/default.css';
+						};
+						document.getElementById('dark').onclick = function () { 
+    						document.getElementById('theme_css').href = '/dark.css';
+						};
+					</script>
+					</div>
 				</body>	
 			</html>
 EOL;
