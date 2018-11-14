@@ -11,6 +11,18 @@
         echo "<head>";	
 		echo "<title>".$config['boardName']."</title>";
 		echo <<<EOT
+			<script>
+			window.onload = function(){
+				var theme = localStorage.getItem('theme');
+				if (theme == "default"){
+					document.getElementById('theme_css').href = '/default.css';
+				};
+				if (theme == "dark"){ 
+    				document.getElementById('theme_css').href = '/dark.css';
+				};
+			}
+			</script>
+
 			<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 			</head>				
 			<body>
@@ -26,11 +38,11 @@ EOT;
 			<div>
 				<div style="text-align:center;margin-right:auto;margin-left:auto;width:30%;">
 					<table>
-						<tr><h3>Make Post</h3></tr>
+						<tr><h3><span class="postFieldTitle">Make Post</span></h3></tr>
 						<form action="post.php" method="POST" enctype="multipart/form-data">
-							<tr><td>File:</td><td><input name="image" type="file"></td></tr>
-    	                    <tr><td>Username (optional): </td><td><input name="username" type="text" value="Anonymous"></td></tr>
-							<td>Comment:</td><td><textarea name="comment"></textarea></td></tr>
+							<tr><td><span class="postField">File:</span></td><td><input name="image" type="file"></td></tr>
+    	                    <tr><td><span class="postField">Username (optional): </span></td><td><input name="username" type="text" value="Anonymous"></td></tr>
+							<td><span class="postField">Comment:</span></td><td><textarea name="comment"></textarea></td></tr>
 							<tr><td><input type="submit" value="Submit" name="submit"></td></tr>
 						</form>
 					</table>	
@@ -82,19 +94,22 @@ EOT;
 echo <<<EOL
 						</tbody>
 					</table>
+					<hr>
+					<br>
 					<div align="center">
-					<div>
-  						<button id="default">Default</button>
-  						<button id="dark">Dark</button>
-					</div> 
+					<select id="themeSwitch">
+  						<option value="default">Default</option>
+  						<option value="dark">Dark</option>
+					</select> 
+					<input type="submit" id="themeSub" value="Apply Theme"></input>
 					<script>
-						
-						document.getElementById('default').onclick = function () {
-							document.getElementById('theme_css').href = '/default.css';
-						};
-						document.getElementById('dark').onclick = function () { 
-    						document.getElementById('theme_css').href = '/dark.css';
-						};
+						document.getElementById("themeSub").onclick = function(){
+							var e = document.getElementById('themeSwitch');
+							var themeSet = e.options[e.selectedIndex].value;
+							localStorage.removeItem('theme');
+							localStorage.setItem('theme', themeSet);
+							window.location.reload();
+						}
 					</script>
 					</div>
 				</body>	
