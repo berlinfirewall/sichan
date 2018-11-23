@@ -1,20 +1,23 @@
 
 <?php
+$config = parse_ini_file('conf/config.ini');
 date_default_timezone_set("America/Los Angeles");
 $time = time();
 
-$target_dir = "user_upload/";
+$target_dir = $config['uploadDir'];
 $target_file = $target_dir . basename($_FILES["image"]["name"]);
 $uploadOk = 1;
 $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
-$topic = $_POST["topic"];
 $comment = $_POST["comment"];
-$username = $_COOKIE['sfsruser'];
+$username = $_POST['username'];
 $ip = $_SERVER['REMOTE_ADDR'];
 
-$conn = new mysqli('localhost', 'perluser', 'RlRegBTrKfq4tfsY', 'SFSR_login');
+$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 
+if (!isset($_POST['username'])){
+    $username = "Anonymous";
+}
 if ($conn->connect_error) {
     die('Database connection failed: '  . $conn->connect_error);
 }
@@ -48,12 +51,14 @@ if ($uploadOk == 0) {
 else {
     $temp = explode(".", $_FILES["image"]["name"]);
     $newfilename = round(microtime(true)) . '.' . end($temp);
-    if (move_uploaded_file($_FILES["image"]["tmp_name"], "user_upload/" . $newfilename)) {
+    if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) {
         $oldfilename = $_FILES["image"]["name"];
-        $sql = $conn->prepare("INSERT INTO uploads (time, user, filename, oldfilename, topic, comment) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$topic', '$comment')");
-        $sql->execute();
+        $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip')");
+        $sql->execute() or die(mysqli_error($conn));
         $conn->close();
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
+        sleep(1);
+        echo "<script type='text/javascript'>window.location.href = 'index.php';</script>";
     } else {
         echo "Sorry, there was an error uploading your file.";
         $conn->close();
