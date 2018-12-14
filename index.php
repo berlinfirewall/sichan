@@ -3,9 +3,50 @@
 	$uploads = $config['uploadDir'];
     $boardImage = $config['boardImage'];
     $headerDir = $config['headerDir'];
+	$page = $_GET['page'];
+	
+	if ($page = null){
+		$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 10";
+	}
+	if ($page != null) {
+		switch($page){
+			case 1:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 10";
+				break;
+			case 2:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 20, 10";
+				break;
+			case 3:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 30, 10";
+				break;
+			case 4:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 40, 10";
+				break;
+			case 5:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 50, 10";
+				break;
+			case 6:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 60, 10";
+				break;
+			case 7:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 70, 10";
+				break;
+			case 8:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 80, 10";
+				break;
+			case 9:
+				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 90, 10";
+				break;
+			default:
+				echo "<p>Page Number invalid</p>";			
+		}
+
+	}
+	$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC ";
+		
     $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
-	$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC";
 	$result = $conn->query($sql);
+
 		echo $config['isImage'];
  		echo "<html>";	
         echo "<head>";	
@@ -56,7 +97,6 @@ EOT;
 							$ext = $pathinfo['extension'];
 							$shortened = substr($row['oldfilename'], 0, 15);
 							$filename = $shortened."...".$ext;
-
 						}
 						else {
 							$filename = $row['oldfilename'];
@@ -67,8 +107,16 @@ EOT;
 						$size = filesize($config['uploadDir']."/".$row['filename']);
 						$sizekb = round($size/1024);
 						
+						$id = $row['id'];
+
+						$getReplies = "SELECT * FROM POSTS WHERE reply='$id'";
+						$link = mysql_connect($config['host'], $config['user'], $config['password']);
+						mysql_select_db($config['database'], $link);
+						$result2 = mysql_query($getReplies, $link) or die(mysql_error());
+						$num_replies = mysql_num_rows($result2);
+						
 						echo "<br>";
-						echo "<div class='postfront' id='".$row['id']."'>";
+						echo "<div class='postfront' id='".$id."'>";
 						echo "<table>";	
 						if(!is_null($row["filename"])){
 							echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB</span></td></tr>";
@@ -84,6 +132,7 @@ EOT;
 						echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
 						echo "<br><span class='fronttext'>". $row["comment"]."</span>";
 						echo "<br><br>";
+						echo "<span class='fronttext'>".$num_replies." Replies"."</span><br>";
 						echo "<a href='http://".$config['url']."/thread.php?id=".$row["id"]."'>View Thread</a>";
 						echo "</td>";
 						echo "</tr>";
