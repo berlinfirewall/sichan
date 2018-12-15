@@ -1,55 +1,53 @@
 <?php
 	$config = parse_ini_file('conf/config.ini');
 	$uploads = $config['uploadDir'];
-    $boardImage = $config['boardImage'];
-    $headerDir = $config['headerDir'];
-	$page = $_GET['page'];
-	
-	if ($page = null){
-		$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 10";
+  $boardImage = $config['boardImage'];
+  $headerDir = $config['headerDir'];
+
+	if (!isset($_GET['page'])){
+		header('Location: http://karabo.ga/index.php?page=1');
 	}
-	if ($page != null) {
-		switch($page){
-			case 1:
+	if ($_GET['page'] != null) {
+		switch($_GET['page']){
+			case "1":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 10";
 				break;
-			case 2:
+			case "2":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 20, 10";
 				break;
-			case 3:
+			case "3":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 30, 10";
 				break;
-			case 4:
+			case "4":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 40, 10";
 				break;
-			case 5:
+			case "5":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 50, 10";
 				break;
-			case 6:
+			case "6":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 60, 10";
 				break;
-			case 7:
+			case "7":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 70, 10";
 				break;
-			case 8:
+			case "8":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 80, 10";
 				break;
-			case 9:
+			case "9":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 90, 10";
 				break;
 			default:
-				echo "<p>Page Number invalid</p>";			
+				echo "<p>Page Number invalid</p>";
 		}
 
 	}
-	$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC ";
-		
-    $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
+
+  $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 	$result = $conn->query($sql);
 
 		echo $config['isImage'];
- 		echo "<html>";	
-        echo "<head>";	
+ 		echo "<html>";
+        echo "<head>";
 		echo "<title>".$config['boardName']."</title>";
 		echo <<<EOT
 			<script>
@@ -58,14 +56,14 @@
 				if (theme == "default"){
 					document.getElementById('theme_css').href = '/default.css';
 				};
-				if (theme == "dark"){ 
+				if (theme == "dark"){
     				document.getElementById('theme_css').href = '/dark.css';
 				};
 			}
 			</script>
 
 			<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
-			</head>				
+			</head>
 			<body>
 EOT;
 		if ($config['isImage'] = 1){
@@ -86,7 +84,7 @@ EOT;
 							<td><span class="postField">Comment:</span></td><td><textarea name="comment"></textarea></td></tr>
 							<tr><td><input type="submit" value="Submit" name="submit"></td></tr>
 						</form>
-					</table>	
+					</table>
 				</div>
 EOT;
 			if ($result->num_rows > 0){
@@ -106,7 +104,7 @@ EOT;
 						$height=$imageinfo[1];
 						$size = filesize($config['uploadDir']."/".$row['filename']);
 						$sizekb = round($size/1024);
-						
+
 						$id = $row['id'];
 
 						$getReplies = "SELECT * FROM POSTS WHERE reply='$id'";
@@ -114,20 +112,20 @@ EOT;
 						mysql_select_db($config['database'], $link);
 						$result2 = mysql_query($getReplies, $link) or die(mysql_error());
 						$num_replies = mysql_num_rows($result2);
-						
+
 						echo "<br>";
 						echo "<div class='postfront' id='".$id."'>";
-						echo "<table>";	
+						echo "<table>";
 						if(!is_null($row["filename"])){
 							echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB</span></td></tr>";
-							echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img style='max-height:250px;' src=".$config['uploadDir']."/".$row["filename"]."></td>";	
+							echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img style='max-height:250px;' src=".$config['uploadDir']."/".$row["filename"]."></td>";
 						}
 						echo "<td class='info'>";
 						if(!$row["name"]){
 							$username = "Anonymous";
 						}
 						if($row['name']){
-							$username = $row['name'];			
+							$username = $row['name'];
 						}
 						echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
 						echo "<br><span class='fronttext'>". $row["comment"]."</span>";
@@ -149,7 +147,7 @@ echo <<<EOL
 					<select id="themeSwitch">
   						<option value="default">Default</option>
   						<option value="dark">Dark</option>
-					</select> 
+					</select>
 					<input type="submit" id="themeSub" value="Apply Theme"></input>
 					<script>
 						document.getElementById("themeSub").onclick = function(){
@@ -160,8 +158,18 @@ echo <<<EOL
 							window.location.reload();
 						}
 					</script>
+
 					</div>
-				</body>	
+EOL;
+$nextPage = (int)$_GET['page'] + 1;
+echo '<a href = "/index.php?page=' . $nextPage . '" style="float:right;">Next</a>';
+
+if ($_GET['page'] != 1){
+	$prevPage = (int)$_GET['page'] - 1;
+	echo '<a href="/index.php?page='.$prevPage.'" style="float:left;"> Previous</a>';
+}
+echo <<<EOL
+				</body>
 			</html>
 EOL;
 ?>
