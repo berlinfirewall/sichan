@@ -36,6 +36,7 @@
 			case "9":
 				$sql = "SELECT * FROM POSTS WHERE reply IS NULL ORDER BY time DESC LIMIT 90, 10";
 				break;
+
 			default:
 				echo "<p>Page Number invalid</p>";
 		}
@@ -161,9 +162,10 @@ echo <<<EOL
 
 					</div>
 EOL;
-$nextPage = (int)$_GET['page'] + 1;
-echo '<a href = "/index.php?page=' . $nextPage . '" style="float:right;">Next</a>';
-
+if ($_GET['page'] != 9){
+	$nextPage = (int)$_GET['page'] + 1;
+	echo '<a href = "/index.php?page=' . $nextPage . '" style="float:right;">Next</a>';
+}
 if ($_GET['page'] != 1){
 	$prevPage = (int)$_GET['page'] - 1;
 	echo '<a href="/index.php?page='.$prevPage.'" style="float:left;"> Previous</a>';

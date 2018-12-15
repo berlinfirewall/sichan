@@ -32,7 +32,7 @@ else {
         }
         $sql = $conn->prepare("INSERT INTO POSTS (time, name, comment, reply, ip) VALUES ('$time', '$username', '$comment', '$thread', '$ip')");
         $sql->execute() or die(mysqli_error($conn));
-        echo ("Reply Submitted.");
+        header ("location: http://" . $config['url']."/thread.php?id=$thread");
         $conn->close();
     }
     if ($_FILES['image']['error'] != 4){
@@ -69,9 +69,7 @@ else {
                 $sql = $conn->prepare("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip')");
                 $sql->execute() or die(mysqli_error($conn));
                 $conn->close();
-                echo "The reply with the file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-                sleep(1);
-                echo "<script type='text/javascript'>window.location.href = '".$config['url']."/thread.php?id='$thread';</script>";
+                header ("location: http://" . $config['url']."/thread.php?id=$thread");
             }
             else {
                 echo "Sorry, there was an error uploading your file.";
@@ -82,5 +80,5 @@ else {
     else {
 
     }
-}  
+}
 ?>
