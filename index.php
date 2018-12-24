@@ -104,6 +104,18 @@ EOT;
 						$height=$imageinfo[1];
 						$size = filesize($config['uploadDir']."/".$row['filename']);
 						$sizekb = round($size/1024);
+						
+						$baseURL = "http://ip-api.com/json/";
+						$ip = $row["ip"];
+						$requestURL = "$baseURL"."$ip";
+
+						$request = file_get_contents($requestURL);
+
+						if ($request !== false){
+							$json = json_decode($request);
+							$flag = strtolower($json->{'countryCode'}).".gif";
+							$flagCode = "<img src=/flags/$flag></img>";
+						}
 
 						$id = $row['id'];
 
@@ -127,7 +139,7 @@ EOT;
 						if($row['name']){
 							$username = $row['name'];
 						}
-						echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
+						echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
 						echo "<br><span class='fronttext'>". $row["comment"]."</span>";
 						echo "<br><br>";
 						echo "<span class='fronttext'>".$num_replies." Replies"."</span><br>";

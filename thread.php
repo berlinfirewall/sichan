@@ -99,6 +99,18 @@ EOT;
 					}
                     echo "<span class='name'>".$opusername."</span> ";
 					echo date('m/d/Y h:m:s', $row["time"]);
+					
+					$baseURL = "http://ip-api.com/json/";
+					$ip = $row["ip"];
+					$requestURL = "$baseURL"."$ip";
+
+					$request = file_get_contents($requestURL);
+
+					if ($request !== false){
+						$json = json_decode($request);
+						$flag = strtolower($json->{'countryCode'}).".gif";
+						print " <img src=/flags/$flag></img>";
+					}
 					echo "<br><span class='text'>". $row["comment"]."</span></td>";
 					echo "</tr>";
 					echo "</table>";
@@ -136,7 +148,18 @@ EOT;
 						if($row['name']){
 							$username = $row['name'];			
 						}
-						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])."</span>";
+						$baseURL = "http://ip-api.com/json/";
+						$ip = $row["ip"];
+						$requestURL = "$baseURL"."$ip";
+
+						$request = file_get_contents($requestURL);
+
+						if ($request !== false){
+							$json = json_decode($request);
+							$flag = strtolower($json->{'countryCode'}).".gif";
+							$flagCode = "<img src=/flags/$flag></img>";
+						}
+						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
 
 						if (preg_match('/[\x3E\x3E]/', $row["comment"])){
     						$splitString = preg_split('/([\x3e\x3e]+\d+)/', $row["comment"], -1, PREG_SPLIT_DELIM_CAPTURE);
