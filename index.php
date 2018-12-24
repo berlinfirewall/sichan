@@ -5,7 +5,7 @@
   $headerDir = $config['headerDir'];
 
 	if (!isset($_GET['page'])){
-		header('Location: http://karabo.ga/index.php?page=1');
+		header('Location: http://'.$config['url'].'/index.php?page=1');
 	}
 	if ($_GET['page'] != null) {
 		switch($_GET['page']){
@@ -74,7 +74,6 @@ EOT;
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
 		}
 		echo <<<EOT
-			<hr>
 			<div>
 				<div style="text-align:center;margin-right:auto;margin-left:auto;width:30%;">
 					<table>
