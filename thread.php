@@ -36,8 +36,8 @@ else
 					<tbody>
 						<tr style="width:100%">
 EOT;
-		if ($config['isImage'] === "yes"){
-			echo "<img class='header' src='".$headerDir."/".$boardImage."'>";
+		if ($config['isImage'] = 1){
+			echo "<a href='http://karabo.ga/board.php'><img class='header' src='".$headerDir."/".$boardImage."'>";
 		}
 		else{
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -100,7 +100,7 @@ EOT;
                     echo "<span class='name'>".$opusername."</span> ";
 					echo date('m/d/Y h:m:s', $row["time"]);
 					
-					$baseURL = "http://ip-api.com/json/";
+					$baseURL = "http://karabo.ga/cgi-bin/ip.pl?ip=";
 					$ip = $row["ip"];
 					$requestURL = "$baseURL"."$ip";
 
@@ -108,7 +108,7 @@ EOT;
 
 					if ($request !== false){
 						$json = json_decode($request);
-						$flag = strtolower($json->{'countryCode'}).".gif";
+						$flag = strtolower($json->{'code'}).".gif";
 						print " <img src=/flags/$flag></img>";
 					}
 					echo "<br><span class='text'>". $row["comment"]."</span></td>";
@@ -148,7 +148,7 @@ EOT;
 						if($row['name']){
 							$username = $row['name'];			
 						}
-						$baseURL = "http://ip-api.com/json/";
+						$baseURL = "http://karabo.ga/cgi-bin/ip.pl?ip=";
 						$ip = $row["ip"];
 						$requestURL = "$baseURL"."$ip";
 
@@ -156,7 +156,7 @@ EOT;
 
 						if ($request !== false){
 							$json = json_decode($request);
-							$flag = strtolower($json->{'countryCode'}).".gif";
+							$flag = strtolower($json->{'code'}).".gif";
 							$flagCode = "<img src=/flags/$flag></img>";
 						}
 						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
