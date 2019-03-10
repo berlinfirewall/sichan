@@ -29,7 +29,12 @@ else
 						};
 					}
 				</script>
+
 				<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
+EOT;
+echo "<meta property='og:title' content='".$config['boardName']."' />";
+echo "<meta property='og:image' content='".$headerDir."/".$boardImage."' />";
+echo <<<EOT
 			</head>				
 			<body>
 				<table style="width:100%;height:100%;"cellspacing="0" cellpadding=4">
@@ -37,7 +42,7 @@ else
 						<tr style="width:100%">
 EOT;
 		if ($config['isImage'] = 1){
-			echo "<a href='http://karabo.ga/board.php'><img class='header' src='".$headerDir."/".$boardImage."'>";
+			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/".$boardImage."'>";
 		}
 		else{
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -84,6 +89,8 @@ EOT;
 					$height=$imageinfo[1];
 					$size = filesize($config['uploadDir']."/".$row['filename']);
 					$sizekb = round($size/1024);
+					echo '<meta property="og:description" content="'.$row['comment'].'" />';
+					
 					echo "<br>";
 					echo "<div class='op' id='".$row["id"]."'>";
         	    	echo "<table>";
@@ -93,25 +100,29 @@ EOT;
 					echo "<td style='vertical-align:top; font-size: 10pt;' id='post' >No.". $row["id"] . " ";
 					if(!$row["name"]){
 							$opusername = "Anonymous";
-						}
+					}
 						if($row['name']){
 							$opusername = $row['name'];			
 					}
-                    echo "<span class='name'>".$opusername."</span> ";
-					echo date('m/d/Y h:m:s', $row["time"]);
-					
-					$baseURL = "http://karabo.ga/cgi-bin/ip.pl?ip=";
-					$ip = $row["ip"];
-					$requestURL = "$baseURL"."$ip";
-
-					$request = file_get_contents($requestURL);
-
-					if ($request !== false){
-						$json = json_decode($request);
-						$flag = strtolower($json->{'code'}).".gif";
-						print " <img src=/flags/$flag></img>";
+					$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+					if(preg_match($reg_exUrl, $row["comment"], $url)) {
+						$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
+                    }
+					else {
+						$comment = $row['comment'];
 					}
-					echo "<br><span class='text'>". $row["comment"]."</span></td>";
+					if($row["adminPost"] == "1"){
+						echo "<span class='admin'>ADMIN - ".$opusername."</span>";
+					}
+					else{
+						echo "<span class='name'>".$opusername."</span> ";
+					}
+					echo date('m/d/Y h:m:s', $row["time"]);
+
+					print " <img src=/flags/".$row["country"].".gif></img> ";
+					$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
+					$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
+					echo "<br><span class='text'>". $comment3 ."</span></td>";
 					echo "</tr>";
 					echo "</table>";
 					echo "</div>";
@@ -148,38 +159,28 @@ EOT;
 						if($row['name']){
 							$username = $row['name'];			
 						}
-						$baseURL = "http://karabo.ga/cgi-bin/ip.pl?ip=";
-						$ip = $row["ip"];
-						$requestURL = "$baseURL"."$ip";
-
-						$request = file_get_contents($requestURL);
-
-						if ($request !== false){
-							$json = json_decode($request);
-							$flag = strtolower($json->{'code'}).".gif";
-							$flagCode = "<img src=/flags/$flag></img>";
-						}
-						echo "<span class='name'>".$username." </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
-
-						if (preg_match('/[\x3E\x3E]/', $row["comment"])){
-    						$splitString = preg_split('/([\x3e\x3e]+\d+)/', $row["comment"], -1, PREG_SPLIT_DELIM_CAPTURE);
-  							$splitNumber = count($splitString);
-							echo "<br>";
-							for ($i = 0; $i <= $splitNumber; $i++){
-        						if (preg_match('/[\x3E\x3E]/', $splitString[$i])){
-									preg_match_all('!\d+!', $splitString, $postnum);
-									echo "<br><span class='text'><a id='reply' style='color:#FF0000;margin:0;' href='#' onclick='document.getElementById('"."$postnum"."').scrollIntoView();>"."$splitString[$i]"."</a>";
-            						print "<span>" . "" . "</b>\n";
-        						}
-        						else {
-            						print "$splitString[$i]\n";
-        						}
-    						}
-							echo "</span>";
-						}
+					
+					 	$flag = $row["country"].".gif";
+						$flagCode = "<img src=/flags/$flag></img>";
+						
+						$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+						if(preg_match($reg_exUrl, $row["comment"], $url)) {
+							$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
+                    	}
 						else {
-							echo "<br><span class='text'>". $row["comment"]."</span>";
+							$comment = $row['comment'];
 						}
+						if($row["adminPost"] == "1"){
+							echo "<span class='admin'>ADMIN - ".$username."</span>";
+						}
+						else{
+							echo "<span class='name'>".$username."</span> ";
+						}
+						echo " </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
+						$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
+						$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
+						
+						echo "<br><span class='text'>". $comment3 ."</span>";
 						echo "</td>";
 						echo "</tr>";
 						echo "</table>";

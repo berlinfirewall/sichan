@@ -8,39 +8,7 @@
 		header('Location: http://'.$config['url'].'/board.php?page=1');
 	}
 	if ($_GET['page'] != null) {
-		switch($_GET['page']){
-			case "1":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 10";
-				break;
-			case "2":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 10, 10";
-				break;
-			case "3":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 20, 10";
-				break;
-			case "4":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 30, 10";
-				break;
-			case "5":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 40, 10";
-				break;
-			case "6":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 50, 10";
-				break;
-			case "7":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 60, 10";
-				break;
-			case "8":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 70, 10";
-				break;
-			case "9":
-				$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT 80, 10";
-				break;
-
-			default:
-				echo "<p>Page Number invalid</p>";
-		}
-
+			$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT ".((15 * $_GET['page']) - 15).",15";
 	}
 
   	$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
@@ -67,7 +35,7 @@
 			<body>
 EOT;
 		if ($config['isImage'] = 1){
-			echo "<img class='header' src='".$headerDir."/".$boardImage."'>";
+			echo "<a href = https://".$config['url']."><img class='header' src='".$headerDir."/".$boardImage."'></a>";
 		}
 		if ($config['isImage'] = 0){
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -109,17 +77,8 @@ EOT;
 							$size = filesize($config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
 
-							$baseURL = "http://".$config['url']."/cgi-bin/ip.pl?ip=";
-							$ip = $row["ip"];
-							$requestURL = "$baseURL"."$ip";
-
-							$request = file_get_contents($requestURL);
-
-							if ($request !== false){
-								$json = json_decode($request);
-								$flag = $json->{'code'}.".gif";
-								$flagCode = "<img src=/flags/$flag></img>";
-							}
+							$flag = $row["country"].".gif";
+							$flagCode = "<img src=/flags/$flag></img>";
 
 							$id = $row['id'];
 
@@ -143,8 +102,17 @@ EOT;
 							if($row['name']){
 								$username = $row['name'];	
 							}
+							$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+							if(preg_match($reg_exUrl, $row["comment"], $url)) {
+								$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
+                    		}
+							else {
+								$comment = $row['comment'];
+							}
+							$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
+							$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="frontquote">$0</span>', $comment2);
 							echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
-							echo "<br><span class='fronttext'>". $row["comment"]."</span>";
+							echo "<br><span class='fronttext'>". $comment3 ."</span>";
 							echo "<br><br>";
 							echo "<span class='fronttext'>".$num_replies." Replies"."</span><br>";
 							echo "<a href='http://".$config['url']."/thread.php?id=".$row["id"]."'>View Thread</a>";

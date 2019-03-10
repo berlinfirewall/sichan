@@ -32,6 +32,15 @@ if ($banned == 1){
     exit();
 }
 else {
+    $baseURL = "http://localhost/cgi-bin/ip.pl?ip=";
+    $requestURL = "$baseURL"."$ip";
+	$request = file_get_contents($requestURL);
+
+   	if ($request !== false){
+    	$json = json_decode($request); 
+		$country = strtolower($json->{'code'});
+	}
+
     if ($_FILES['image']['error'] == 4) {
         if ($reply == 0) {
             $replyTo = 0;
@@ -40,7 +49,7 @@ else {
             echo "<p>Please supply a comment.</p>\n";
             $conn->close();
         }
-        $sql = "INSERT INTO POSTS (time, name, comment, reply, ip) VALUES ('$time', '$username', '$comment', '$thread', '$ip')";
+        $sql = "INSERT INTO POSTS (time, name, comment, reply, ip, country) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country')";
         $conn->query($sql) or die(mysqli_error($conn));
         $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump");
         header ("location: http://" . $config['url']."/thread.php?id=$thread");
@@ -74,9 +83,10 @@ else {
         else {
             $temp = explode(".", $_FILES["image"]["name"]);
             $newfilename = round(microtime(true)) . '.' . end($temp);
+
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
                 $oldfilename = $_FILES["image"]["name"];
-                $sql = ("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, ip) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip')");
+                $sql = ("INSERT INTO POSTS (time, name, filename, oldfilename, comment, reply, ip, country) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip', '$country')");
                 $conn->query($sql) or die(mysqli_error($conn));
                 $conn->close();
                 $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump");
