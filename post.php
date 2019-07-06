@@ -64,17 +64,16 @@ if ($uploadOk == 0) {
 else {
     $temp = explode(".", $_FILES["image"]["name"]);
     $newfilename = round(microtime(true)) . '.' . end($temp);
+    $baseURL = "http://localhost/cgi-bin/ip.pl?ip=";
+    $requestURL = "$baseURL"."$ip";
+    $request = file_get_contents($requestURL);
+   	if ($request !== false){
+	    	$json = json_decode($request); 
+  			$country = strtolower($json->{'code'});
+	}
+
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) { 
         $oldfilename = $_FILES["image"]["name"];
-        
-        $baseURL = "http://localhost/cgi-bin/ip.pl?ip=";
-		$requestURL = "$baseURL"."$ip";
-		$request = file_get_contents($requestURL);
-
-		if ($request !== false){
-			$json = json_decode($request);
-			$country = strtolower($json->{'code'});
-		}
 
         $sql = $conn->query("INSERT INTO POSTS (time, name, filename, oldfilename, comment, ip, country) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country')") or die(mysqli_error($conn));
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
