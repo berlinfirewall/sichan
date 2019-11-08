@@ -1,7 +1,16 @@
 Work in Progress
 =================
 
-Imageboard software designed to be very minimal
+Imageboard software designed to be very minimal. Currently a work in progress.
 
-## To do: ##
- * Create Script which sets it up for you
+Perl Dependencies:
+*DBI
+*Config::IniFiles
+
+PHP Dependencies:
+*GeoIP2-php
+
+Also requires Maxmind GeoLite2 Country Database
+
+
+
