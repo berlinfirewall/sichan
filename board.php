@@ -8,7 +8,7 @@
 		header('Location: http://'.$config['url'].'/board.php?page=1');
 	}
 	if ($_GET['page'] != null) {
-			$sql = "SELECT id FROM BUMP ORDER BY number ASC LIMIT ".((15 * $_GET['page']) - 15).",15";
+			$sql = "SELECT * FROM BUMP WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM BUMP ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
 	}
 
   	$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
@@ -29,15 +29,27 @@
 				};
 			}
 			</script>
+			<script>
+			function hide(post){
+				x = document.getElementById(post);
+				if (x.style.display === "none"){
+					x.style.display = "block";
+				}
+				else {
+					x.style.display = "none";
+				}
+			}
+			</script>
 
 			<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 			</head>
 			<body>
 EOT;
-		if ($config['isImage'] = 1){
-			echo "<a href = https://".$config['url']."><img class='header' src='".$headerDir."/".$boardImage."'></a>";
+		if ($config['isImage'] == 1){
+			$images = $config['image'];
+			echo "<a href='http://".$config['url']."'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
 		}
-		if ($config['isImage'] = 0){
+		if ($config['isImage'] == 0){
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
 		}
 		echo <<<EOT
@@ -48,7 +60,17 @@ EOT;
 						<form action="post.php" method="POST" enctype="multipart/form-data">
 							<tr><td><span class="postField">File:</span></td><td><input name="image" type="file"></td></tr>
     	                    <tr><td><span class="postField">Username (optional): </span></td><td><input name="username" type="text" value="Anonymous"></td></tr>
-							<td><span class="postField">Comment:</span></td><td><textarea name="comment"></textarea></td></tr>
+							<td><span class="postField">Comment:</span></td><td><textarea rows="5" cols="40" name="comment"></textarea></td></tr>
+							<input type="hidden" name="userID" id="userID" value="">
+							<script>
+								if (typeof(Storage) !== "undefined"){
+									var UserID = localStorage.getItem("userID");
+									if (UserID !== null){
+										document.getElementById("userID").value = UserID;
+									}
+
+								}
+							</script>
 							<tr><td><input type="submit" value="Submit" name="submit"></td></tr>
 						</form>
 					</table>
@@ -57,6 +79,7 @@ EOT;
 			if ($result->num_rows > 0){
 				while($row1 = $result->fetch_assoc()){
 						$BumpID = $row1['id'];
+						$isPinned = $row1['isPinned'];
 						$sql2 = "SELECT * FROM POSTS WHERE id = $BumpID";
 						$getPosts = $conn->query($sql2);
 						if ($getPosts->num_rows > 0){
@@ -66,19 +89,25 @@ EOT;
 									$pathinfo = pathinfo("$filepath");
 									$ext = $pathinfo['extension'];
 									$shortened = substr($row['oldfilename'], 0, 15);
-								$filename = $shortened."...".$ext;
-							}
-							else {
-								$filename = $row['oldfilename'];
-							}
+		 							$filename = $shortened."...".$ext;
+								}
+								else {
+									$filename = $row['oldfilename'];
+								}
 							$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
 							$width=$imageinfo[0];
 							$height=$imageinfo[1];
 							$size = filesize($config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
+							if ($row['country'] == null){
+         						$country = "xx";
+            				}
+            
+            				if ($row['country'] != null){
+                				$country = $row['country'];
+            				}
+							$flagCode = "<img src=/flags/".$country.".gif></img> ";
 
-							$flag = $row["country"].".gif";
-							$flagCode = "<img src=/flags/$flag></img>";
 
 							$id = $row['id'];
 
@@ -91,9 +120,20 @@ EOT;
 							echo "<br>";
 							echo "<div class='postfront' id='".$id."'>";
 							echo "<table>";
+							if($isPinned == "1"){
+								$pinned ="<img src=/img/sticky.gif></img>";
+							}
+							if($isPinned != "1"){
+								$pinned = "";
+							}
 							if(!is_null($row["filename"])){
-								echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB</span></td></tr>";
-								echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img style='max-height:250px;' src=".$config['uploadDir']."/".$row["filename"]."></td>";
+								echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB $pinned</span></td></tr>";
+								if($row['isVideo'] == "1"){
+									echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
+								}
+								else {
+						        	echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img style='max-height:250px;max-width:300px;' src=".$config['uploadDir']."/".$row["filename"]."></td>";
+								}
 							}
 							echo "<td class='info'>";
 							if(!$row["name"]){
@@ -102,6 +142,7 @@ EOT;
 							if($row['name']){
 								$username = $row['name'];	
 							}
+							
 							$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 							if(preg_match($reg_exUrl, $row["comment"], $url)) {
 								$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
@@ -109,9 +150,15 @@ EOT;
 							else {
 								$comment = $row['comment'];
 							}
+							if($row["adminPost"] == "1"){
+								echo "<span class='admin'>ADMIN - ".$username."</span>";
+							}
+							else{
+								echo "<span class='frontname'>".$username."</span> ";
+							}
 							$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
 							$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="frontquote">$0</span>', $comment2);
-							echo "<span class='frontname'>".$username." </span><span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
+							echo "<span class='fronttext'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:i:s', $row["time"])." $flagCode"."</span> <a href='#' onclick='hide(".$id.");return false'>hide</a>";
 							echo "<br><span class='fronttext'>". $comment3 ."</span>";
 							echo "<br><br>";
 							echo "<span class='fronttext'>".$num_replies." Replies"."</span><br>";
@@ -149,11 +196,11 @@ echo <<<EOL
 EOL;
 if ($_GET['page'] != 9){
 	$nextPage = (int)$_GET['page'] + 1;
-	echo '<a href = "/board.php?page=' . $nextPage . '" style="float:right;">Next</a>';
+	echo '<a href = "/board.php?page=' . $nextPage . '" style="float:right;margin-bottom:20px;font-size:20pt;margin-right:20px;">Next</a>';
 }
 if ($_GET['page'] != 1){
 	$prevPage = (int)$_GET['page'] - 1;
-	echo '<a href="/board.php?page='.$prevPage.'" style="float:left;"> Previous</a>';
+	echo '<a href="/board.php?page='.$prevPage.'" style="float:left;margin-bottom:20px;font-size:20pt;margin-left:20px;padding:5px;"> Previous</a>';
 }
 echo <<<EOL
 				</body>

@@ -1,46 +1,45 @@
 img.post{
 	width:100%;
-	max-width:150px;
-	max-height: 512px;
+	max-width:300px;
+	min-width: 150px;
+	max-height: 300px;
 }
 body{
-	background-color:#1e1e1e;
+	background-color:#EEF2FF;
 }
 div.postreply{
 	width: 70%;
-	background-color: #333333;
+	background-color: #b7c5d9;
 	border-spacing:0;
-	color: #999999;
+	color: #000;
 	font-family: arial,helvetica,sans-serif;
 	font-size: 10pt;
-}
-textarea{
-	background: #333333;
-	color: #CCCCCC;
-	border: #666666 1px solid;
-}
-input {
-	background: #333333;
-	color: #CCCCCC;
-	border: #666666 1px solid;
 }
 div.op{
 	 position:relative;
  	 top:-5px;
 	 vertical-align: super;
 	 border-spacing:0;
-	 color: #1e1e1e;
+	 color: #000;
 	 font-family: arial,helvetica,sans-serif;
 	 font-size: 10pt;
 }
 div.postfront{
-	background-color: #333333;
+	background-color: #b7c5d9;
 	border-spacing:0;
-	color: #999999;
+	color: #000;
 	font-family: arial,helvetica,sans-serif;
 	font-size: 12pt;
 	margin: 5px;
 	padding: 3px;
+}
+div.latest {
+	width: 330px;
+	margin-top: 10px;
+	border: 1px solid #006;
+	padding: 0;
+	float: right;
+	background: #eef;
 }
 div.boxes{
     max-width: 670px;
@@ -50,47 +49,37 @@ div.boxes{
     padding: 0;
 
 }
-div.desc{
-    max-width: 670px;
-    min-width: 332px;
-    margin: 30px auto;
-    overflow: auto;
-    padding: 0;
-}
-
 div.stats {
 	width: 330px;
+	border: 1px solid #006;
 	margin-top: 10px;
 	padding: 0;
 	float: right;
-	background: #333333;
+	background: #eef;
 }
-div.latest {
-	width: 330px;
-	margin-top: 10px;
-	padding: 0;
-	float: right;
-	background: #333333;
+span.quote{
+	vertical-align:top; 
+	font-size: 10pt;
+	color: #789922;
 }
-
+span.admin{
+	color: #FF0000;
+	font-weight: 700;
+	vertical-align:top; 
+	font-size: 10pt;
+}
 div.latestImages {
 	width: 330px;
 	margin-top: 10px;
+	border: 1px solid #060;
 	padding: 0;
 	float: left;
-	background: #333333;
+	background: #efe;
 } 
-div.FAQ{
-	width: 500px;
-	margin-top: 10px;
-	margin-right: 30%;
-	margin-left: 37%;
-	padding: 0;
-}
-div.radio{
-	display: block;
-	text-align: center;
-	margin: auto;
+div.desc {
+    max-width: 670px;
+    min-width: 332px;
+    margin: 30px auto;
 }
 img.header {
     display: block;
@@ -98,36 +87,15 @@ img.header {
 	max-height: 257px;
 }
 span.name {
-	color: #32dd72;
+	color: #117743;
 	font-weight: 700;
 	vertical-align:top; 
 	font-size: 10pt;
-}
-span.postField{
-	color: #999999;
-	font-family: arial,helvetica,sans-serif;
-}
-span.quote{
-	color: #789922;
-}
-span.postFieldTitle{
-	color: #999999;
-	font-family: arial,helvetica,sans-serif;
 }
 span.frontname {
-	color: #32dd72;
+	color: #117743;
 	font-weight: 700;
 	vertical-align:top; 
-	font-size: 12pt;
-}
-span.text{
-	vertical-align:top; 
-	font-size: 10pt;
-	color: #999999;
-}
-span.fronttext{
-	vertical-align:top;
-	color: #999999;
 	font-size: 12pt;
 }
 span.frontquote{
@@ -135,15 +103,17 @@ span.frontquote{
 	font-size: 12pt;
 	color: #789922;
 }
+span.text{
+	vertical-align:top; 
+	font-size: 10pt;
+}
+span.fronttext{
+	vertical-align:top; 
+	font-size: 12pt;
+}
 span.imagedesc{
 	vertical-align:top;
 	font-size: 8pt;
-}
-span.admin{
-	color: #FF0000;
-	font-weight: 700;
-	vertical-align:top; 
-	font-size: 10pt;
 }
 td.info{
 	vertical-align:top;
@@ -152,49 +122,45 @@ h1.header{
 	text-align: center;
 	font-family: arial,helvetica,sans-serif;
 }
-a {
-	color: #999999;
-}
 ul.postlist{
 	list-style: none;
 }
+
 h2.latestheader{
-	color: #999999;
-	text-align: center;
+	background: #5699AA;
+	color: #FFFFFF;
+	padding: 2px;
+	vertical-align: top;
 	font-family: arial,helvetica,sans-serif;
 }
 h2.latestimageheader{
-	color: #999999;
-	text-align: center;
+	color: #FFFFFF;
+	vertical-align: top;
+	background: #060;
+	padding: 2px;
 	font-family: arial,helvetica,sans-serif;
 }
 h2.frontheader{
-	color: #999999;
+	color: #AF0A0F;
 	text-align: center;
+	padding: 2px;
 	font-family: arial,helvetica,sans-serif;
 }
 h3.frontheader{
-	color: #999999;
+	color: #AF0A0F;
 	text-align: center;
-	font-family: arial, helvetica, sans-serif;
+	padding: 2px;
+	font-family: arial,helvetica,sans-serif;
 }
 h4.headline{
-	color: #32dd72;
-    	text-align: center;
-	padding: 2px;
-   	font-family: arial,helvetica,sans-serif;
+    text-align: center;
+    padding: 2px;
+    font-family: arial,helvetica,sans-serif;
 }
-h5.desc{
-        color: #32dd72;
-        text-align: center;
-        padding: 2px;
-        font-family: arial,helvetica,sans-serif;
+a.latest {
+	text-decoration: none;
 }
-video.post{
-	max-width: 200px;
-	max-height: 300px;
-}
-video.front{
+img.front{
 	max-width: 280px;
 	display: block;
 	margin-left: auto;
@@ -202,10 +168,25 @@ video.front{
 	margin-bottom: 8px;
 	max-height: 300px;
 }
-a.latest {
-	text-decoration: none;
+div.latest {
+	width: 330px;
+	margin-top: 10px;
+	margin-right: 30%;
+	border: 1px solid #006;
+	padding: 0;
+	float: right;
+	background: #eef;
 }
-img.front{
+h5.desc{
+    text-align: center;
+    padding: 2px;
+    font-family: arial,helvetica,sans-serif;
+}
+video.post{
+	max-width: 200px;
+	max-height: 300px;
+}
+video.front{
 	max-width: 280px;
 	display: block;
 	margin-left: auto;

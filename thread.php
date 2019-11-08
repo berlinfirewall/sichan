@@ -42,7 +42,8 @@ echo <<<EOT
 						<tr style="width:100%">
 EOT;
 		if ($config['isImage'] = 1){
-			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/".$boardImage."'>";
+			$headerImg = rand(1,9).".png";
+			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/".$headerImg."'></a>";
 		}
 		else{
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -61,7 +62,7 @@ EOT;
 		echo "<input type='hidden' name='thread' value='".$thread."'>";
 		echo <<<EOT
 												<tr><td><span class="postField">Name:</span></td><td><input name="username" value="Anonymous" type="text"></td></tr>
-												<td><span class="postField">Reply:</span></td><td><textarea name="comment"></textarea></td></tr>
+												<td><span class="postField">Reply:</span></td><td><textarea rows="5" cols="40" name="comment"></textarea></td></tr>
 												
 												<tr><td><input type="submit" value="Submit" name="submit"></td></tr>
 											</form>
@@ -96,30 +97,42 @@ EOT;
         	    	echo "<table>";
 					echo "<a href='$filepath'>".$filename."</a> <span> (".$height."x".$width.") $sizekb KB</span>";
 					echo "<span>".$imagesize."</span>";
-					echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><img src='$filepath' class='post'></a></td>";
+					if($row['isVideo'] == "1"){
+						echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
+					}
+					else {
+						echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><img src='$filepath' class='post'></a></td>";
+					}
 					echo "<td style='vertical-align:top; font-size: 10pt;' id='post' >No.". $row["id"] . " ";
 					if(!$row["name"]){
 							$opusername = "Anonymous";
 					}
-						if($row['name']){
+					if($row['name']){
 							$opusername = $row['name'];			
 					}
 					$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 					if(preg_match($reg_exUrl, $row["comment"], $url)) {
-						$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
+						$res = preg_replace("/(\x3c(br)\x3e)/", "", $url[0]);
+						$comment = preg_replace($reg_exUrl, '<a href="'.$res.'" rel="nofollow">'.$res.'</a>', $row["comment"]);
                     }
 					else {
 						$comment = $row['comment'];
 					}
 					if($row["adminPost"] == "1"){
-						echo "<span class='admin'>ADMIN - ".$opusername."</span>";
+						echo "<span class='admin'>ADMIN - ".$opusername ."</span> ";
 					}
 					else{
 						echo "<span class='name'>".$opusername."</span> ";
 					}
 					echo date('m/d/Y h:m:s', $row["time"]);
-
-					print " <img src=/flags/".$row["country"].".gif></img> ";
+					if ($row['country'] == null){
+         				$country = "xx";
+            		}
+            
+            		if ($row['country'] != null){
+                		$country = $row['country'];
+            		}
+					print " <img src=/flags/".$country.".gif></img> ";
 					$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
 					$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
 					echo "<br><span class='text'>". $comment3 ."</span></td>";
@@ -138,19 +151,25 @@ EOT;
 						if(!is_null($row["filename"])){
 							$filepath = $config['uploadDir']."/".$row['filename'];
 							$filename = $row['oldfilename'];
+							$pathinfo = pathinfo("$filepath");
+							$ext = $pathinfo['extension'];
 							if (strlen($row['oldfilename']) > 18 ){
-								$pathinfo = pathinfo("$filepath");
-								$ext = $pathinfo['extension'];
 								$shortened = substr($row['oldfilename'], 0, 15);
 								$filename = $shortened."...".$ext;
 							}
-							$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
-							$width=$imageinfo[0];
-							$height=$imageinfo[1];
 							$size = filesize($config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
-							echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> (".$width."x".$height.") $sizekb KB </span></td></tr>";
-							echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img class='post' src=".$config['uploadDir']."/".$row["filename"]."></td>";	
+							if($row["isVideo"] == "1"){
+								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
+								echo "<tr><td><video controls class='post'><source src=".$config['uploadDir']."/".$row["filename"]."></video></td>";	
+							}
+							else {
+								$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
+								$width=$imageinfo[0];
+								$height=$imageinfo[1];
+								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> (".$width."x".$height.") $sizekb KB </span></td></tr>";
+								echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img class='post' src=".$config['uploadDir']."/".$row["filename"]."></a></td>";	
+							}
 						}
 						echo "<td class='info'>";
 						if(!$row["name"]){
@@ -160,12 +179,20 @@ EOT;
 							$username = $row['name'];			
 						}
 					
-					 	$flag = $row["country"].".gif";
-						$flagCode = "<img src=/flags/$flag></img>";
+					 	if ($row['country'] == null){
+         					$country = "xx";
+            			}
+            
+            			if ($row['country'] != null){
+                			$country = $row['country'];
+            			}
+
+						$flagCode = "<img src=/flags/$country.gif></img>";
 						
 						$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 						if(preg_match($reg_exUrl, $row["comment"], $url)) {
-							$comment = preg_replace($reg_exUrl, '<a href="'.$url[0].'" rel="nofollow">'.$url[0].'</a>', $row["comment"]);
+							$res = preg_replace("/(\x3c(br)\x3e)/", "", $url[0]);
+							$comment = preg_replace($reg_exUrl, '<a href="'.$res.'" rel="nofollow">'.$res.'</a>', $row["comment"]);
                     	}
 						else {
 							$comment = $row['comment'];
@@ -176,10 +203,11 @@ EOT;
 						else{
 							echo "<span class='name'>".$username."</span> ";
 						}
-						echo " </span><span class='text'; font-size: 10pt;'> No.".$row['id'].date(' m/d/Y h:m:s', $row["time"])." $flagCode"."</span>";
-						$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
+						echo " </span><span class='text'; font-size: 10pt;'>No.".$row['id'].date(' m/d/Y h:i:s', $row["time"])." $flagCode"."</span>";
+						$replyNumber = array();
+						preg_match("/(?<=(\x3e)(\x3e))[\d+]+/m", $comment, $replyNumber);
+						$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#'.$replyNumber["0"].'">$0</a></span>', $comment);
 						$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
-						
 						echo "<br><span class='text'>". $comment3 ."</span>";
 						echo "</td>";
 						echo "</tr>";
