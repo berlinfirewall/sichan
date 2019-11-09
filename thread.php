@@ -42,8 +42,8 @@ echo <<<EOT
 						<tr style="width:100%">
 EOT;
 		if ($config['isImage'] = 1){
-			$headerImg = rand(1,9).".png";
-			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/".$headerImg."'></a>";
+			$images = $config['image'];
+			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
 		}
 		else{
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
