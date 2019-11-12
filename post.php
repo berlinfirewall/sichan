@@ -16,6 +16,7 @@ $comment0 = nl2br(str_replace("'", "&#39;", $_POST['comment']), false);
 $comment1 = nl2br(str_replace("\"", "&#34;", $_POST['comment']), false);
 $username = $_POST['username'];
 $ip = $_SERVER['REMOTE_ADDR'];
+$userID = $_POST="userID";
 $reader = new Reader($config['IPGeo']);
 $record = $reader->country($ip);
 
@@ -31,7 +32,12 @@ if (!isset($_POST['username'])){
 if ($conn->connect_error) {
     die('Database connection failed: '  . $conn->connect_error);
 }
-
+if ($banned == 1){
+    echo "Sorry, you are banned!";
+    $uploadOk = 0;
+    $conn->close();
+    exit();
+}
 if(isset($_POST["submit"])) {
     if($imageFileType == "jpg" || $imageFileType == "png" || $imageFileType == "jpeg" || $imageFileType == "gif" ) {
         $check = getimagesize($_FILES["image"]["tmp_name"]);
@@ -46,7 +52,7 @@ if(isset($_POST["submit"])) {
         }
     }
     
-    if($imageFileType == "mp4" || $imageFileType == "webm" || $imageFileType == "ogg"){
+    if($imageFileType == "mp4" || $imageFileType == "webm" || $imageFileType == "ogg" || $imageFileType == "mov"){
         echo "File is a video.";
         $uploadOk = 1;
         $isVideo = 1;
@@ -57,12 +63,7 @@ if(isset($_POST["submit"])) {
         $uploadOk = 0;
         exit();
     }
-    if ($banned == 1){
-        echo "Sorry, you are banned!";
-        $uploadOk = 0;
-        $conn->close();
-        exit();
-    }
+
     if ($_FILES["image"]["size"] > 25000000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
@@ -78,22 +79,27 @@ else {
     $newfilename = round(microtime(true)) . '.' . end($temp);
     $countryCode = $record->country->isoCode;
     $country = strtolower($countryCode);
-
+    $userID = substr(str_shuffle(str_repeat($x="0123456789abcdefghijklmnopqurstuvwxyzçşəıöüABCDEFGHIJKLMNOPQURSTUVWXYZÇŞƏİÖÜ", ceil(8/strlen($x)) )),1,8);
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) { 
         $oldfilename = $_FILES["image"]["name"];
-
-        $sql = $conn->query("INSERT INTO POSTS (time, name, filename, oldfilename, comment, ip, country, isVideo) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo')") or die(mysqli_error($conn));
+        echo "<script type='text/javascript'> localStorage.setItem('userID', '".$userID."'); </script>";
+        $sql = $conn->query("INSERT INTO POSTS (time, name, filename, oldfilename, comment, ip, country, isVideo, userID) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID')") or die(mysqli_error($conn));
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
         $sql2 = "SELECT id FROM POSTS WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
         $getID = $conn->query($sql2) or die(mysqli_error($conn));
         while ($row = $getID->fetch_assoc()){
             $id = $row['id'];
             $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$id&action=new");
-            print "<p>".$bump."<p>";
+            print "<p>".$bump."<p>";      
         }
+
         $conn->close();
         sleep(1);
-        echo "<script type='text/javascript'>window.location.href = 'board.php';</script>";
+        echo <<<EOL
+        <script type='text/javascript'>
+            window.location.href = 'board.php';           
+        </script>";
+EOL;
     } else {
         echo "Sorry, there was an error uploading your file.";
         $conn->close();
