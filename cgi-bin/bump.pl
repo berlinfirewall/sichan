@@ -10,13 +10,14 @@ my $cgi = CGI->new();
 print $cgi->header("text/plain");
 my $thread = $cgi->param('id');
 my $action = $cgi->param('action');
+my $board = $cgi->param('board');
 
-my $cfg = Config::IniFiles->new(-file => "/var/www/html/conf/config.ini");
-my $db = $cfg->val('database', 'database');
-my $username = $cfg->val('database', 'user');
-my $password = $cfg->val('database', 'password');
-my $host = $cfg->val('database', 'host');
-my $dbhString = 'DBI:mysql:'.$db.';host='.$host;
+my $cfg = Config::IniFiles->new(-file => "/var/www/html/conf/config-boards.ini", -php_compat => 1);
+my $db = $cfg->val($board, "db-$board");
+my $username = $cfg->val($board, "dbuser-$board");
+my $password = $cfg->val($board, "dbpassword-$board");
+my $host = $cfg->val($board, "dbhost-$board");
+my $dbhString = "DBI:mysql:$db;host=$host";
 
 my $dbh = DBI->connect($dbhString, $username, $password) || die "Could not connect to database: $DBI::errstr";
 

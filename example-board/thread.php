@@ -1,5 +1,7 @@
 <?php
-$config = parse_ini_file('conf/config.ini');
+$board = explode('/', $_SERVER['REQUEST_URI'])[1];
+$boardCFG = parse_ini_file('../conf/config-boards.ini');
+$config = parse_ini_file('../conf/config.ini');
 $thread = ($_GET["id"]);
 $uploads = $config['uploadDir'];
 $boardImage = $config['boardImage'];
@@ -11,7 +13,7 @@ if(!isset ($_GET["id"])){
 
 else 
 {
-    $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
+    $conn = new mysqli($boardCFG['dbhost-'.$board], $boardCFG['dbuser-'.$board], $boardCFG['dbpassword-'.$board], $boardCFG['db-'.$board]);
     $sql = "SELECT * FROM POSTS WHERE id='$thread'";
 	$result = $conn->query($sql);
         echo "<html>";	
@@ -32,8 +34,14 @@ else
 
 				<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 EOT;
-echo "<meta property='og:title' content='".$config['boardName']."' />";
-echo "<meta property='og:image' content='".$headerDir."/".$boardImage."' />";
+if ($result->num_rows > 0){
+	while($row = $result->fetch_assoc()){
+		echo "<meta property='og:title' content='".$boardCFG['boardTagline-'.$board]."'/>";
+		echo "<meta property='og:image' content='".$config['uploadDir']."/".$row['filename']."'/>";
+		echo "<meta property='og:description' content='".$row['comment']."'/>";
+	
+
+
 echo <<<EOT
 			</head>				
 			<body>
@@ -43,7 +51,7 @@ echo <<<EOT
 EOT;
 		if ($config['isImage'] = 1){
 			$images = $config['image'];
-			echo "<a href='http://".$config['url']."/board.php'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
+			echo "<a href='http://".$config['url']."/".$board."/'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
 		}
 		else{
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -56,10 +64,11 @@ EOT;
 									<tr>
 										<h4><span class="postFieldTitle">Reply to Post</span></h4>
 									</tr>
-									<form action="postReply.php" method="POST" enctype="multipart/form-data">
+									<form action="../postReply.php" method="POST" enctype="multipart/form-data">
                                     <tr><td><span class="postField">File:</span></td><td><input name="image" type="file"></td></tr>
 EOT;
 		echo "<input type='hidden' name='thread' value='".$thread."'>";
+		echo "<input type='hidden' name='board' value='".$board."'>";
 		echo <<<EOT
 												<tr><td><span class="postField">Name:</span></td><td><input name="username" value="Anonymous" type="text"></td></tr>
 												<td><span class="postField">Reply:</span></td><td><textarea rows="5" cols="40" name="comment"></textarea></td></tr>
@@ -71,9 +80,7 @@ EOT;
 										</div>							
 								
 EOT;
-       	 if ($result->num_rows > 0){
-				while($row = $result->fetch_assoc()){
-					$filepath = $config['uploadDir']."/".$row['filename'];
+					$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
 					if (strlen($row['oldfilename']) > 18 ){
 						$pathinfo = pathinfo("$filepath");
 						$ext = $pathinfo['extension'];
@@ -90,12 +97,10 @@ EOT;
 					$height=$imageinfo[1];
 					$size = filesize($config['uploadDir']."/".$row['filename']);
 					$sizekb = round($size/1024);
-					echo '<meta property="og:description" content="'.$row['comment'].'" />';
-					
 					echo "<br>";
 					echo "<div class='op' id='".$row["id"]."'>";
         	    	echo "<table>";
-					echo "<a href='$filepath'>".$filename."</a> <span> (".$height."x".$width.") $sizekb KB</span>";
+					echo "<a href=/'$filepath'>".$filename."</a> <span> (".$height."x".$width.") $sizekb KB</span>";
 					echo "<span>".$imagesize."</span>";
 					if($row['isVideo'] == "1"){
 						echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
@@ -132,7 +137,7 @@ EOT;
             		if ($row['country'] != null){
                 		$country = $row['country'];
             		}
-					print " <img src=/flags/".$country.".gif></img> ";
+					print " <img src=/img/flags/".$country.".gif></img> ";
 					$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
 					$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
 					echo "<br><span class='text'>". $comment3 ."</span></td>";
@@ -149,7 +154,7 @@ EOT;
 						echo "<div class='postreply' id='".$row['id']."'>";
 						echo "<table>";	
 						if(!is_null($row["filename"])){
-							$filepath = $config['uploadDir']."/".$row['filename'];
+							$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
 							$filename = $row['oldfilename'];
 							$pathinfo = pathinfo("$filepath");
 							$ext = $pathinfo['extension'];
@@ -161,14 +166,14 @@ EOT;
 							$sizekb = round($size/1024);
 							if($row["isVideo"] == "1"){
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
-								echo "<tr><td><video controls class='post'><source src=".$config['uploadDir']."/".$row["filename"]."></video></td>";	
+								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";	
 							}
 							else {
 								$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
 								$width=$imageinfo[0];
 								$height=$imageinfo[1];
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> (".$width."x".$height.") $sizekb KB </span></td></tr>";
-								echo "<tr><td><a href=".$config['uploadDir']."/".$row["filename"] ."><img class='post' src=".$config['uploadDir']."/".$row["filename"]."></a></td>";	
+								echo "<tr><td><a href=".$filepath."><img class='post' src=".$filepath."></a></td>";	
 							}
 						}
 						echo "<td class='info'>";
@@ -187,7 +192,7 @@ EOT;
                 			$country = $row['country'];
             			}
 
-						$flagCode = "<img src=/flags/$country.gif></img>";
+						$flagCode = "<img src=/img/flags/$country.gif></img>";
 						
 						$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 						if(preg_match($reg_exUrl, $row["comment"], $url)) {
