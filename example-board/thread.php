@@ -92,10 +92,10 @@ EOT;
 						$filename = $row['oldfilename'];
 					}
 
-					$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
+					$imageinfo = getimagesize('../'.$config['uploadDir']."/".$row['filename']);
 					$width=$imageinfo[0];
 					$height=$imageinfo[1];
-					$size = filesize($config['uploadDir']."/".$row['filename']);
+					$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 					$sizekb = round($size/1024);
 					echo "<br>";
 					echo "<div class='op' id='".$row["id"]."'>";
@@ -162,14 +162,14 @@ EOT;
 								$shortened = substr($row['oldfilename'], 0, 15);
 								$filename = $shortened."...".$ext;
 							}
-							$size = filesize($config['uploadDir']."/".$row['filename']);
+							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
 							if($row["isVideo"] == "1"){
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
 								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";	
 							}
 							else {
-								$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
+								$imageinfo = getimagesize('../'.$config['uploadDir']."/".$row['filename']);
 								$width=$imageinfo[0];
 								$height=$imageinfo[1];
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> (".$width."x".$height.") $sizekb KB </span></td></tr>";

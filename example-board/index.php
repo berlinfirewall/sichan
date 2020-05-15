@@ -89,7 +89,7 @@ EOT;
 						$getPosts = $conn->query($sql2);
 						if ($getPosts->num_rows > 0){
 							while($row = $getPosts->fetch_assoc()){
-								$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
+								$filepath = $config['uploadDir']."/".$row['filename'];
 								if (strlen($row['oldfilename']) > 18 ){
 									$pathinfo = pathinfo("$filepath");
 									$ext = $pathinfo['extension'];
@@ -99,10 +99,10 @@ EOT;
 								else {
 									$filename = $row['oldfilename'];
 								}
-							$imageinfo = getimagesize($config['uploadDir']."/".$row['filename']);
+							$imageinfo = getimagesize("../".$filepath);
 							$width=$imageinfo[0];
 							$height=$imageinfo[1];
-							$size = filesize($config['uploadDir']."/".$row['filename']);
+							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
 							if ($row['country'] == null){
          						$country = "xx";
@@ -137,7 +137,7 @@ EOT;
 									echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
 								}
 								else {
-						        	echo "<tr><td><a href=".$filepath."><img style='max-height:250px;max-width:300px;' src=".'https://'.$config['url'].'/'.$config['uploadDir']."/".$row["filename"]."></td>";
+						        	echo "<tr><td><a href=/".$filepath ."><img style='max-height:250px;max-width:300px;' src='https://".$config['url'].'/'.$filepath."'></td>";
 								}
 							}
 							echo "<td class='info'>";
