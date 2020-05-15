@@ -100,7 +100,7 @@ EOT;
 								else {
 									$filename = $row['oldfilename'];
 								}
-							$imageinfo = getimagesize("../".$filepath);
+							$imageinfo = getimagesize($filepath);
 							$width=$imageinfo[0];
 							$height=$imageinfo[1];
 							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
