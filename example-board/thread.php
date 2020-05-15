@@ -81,9 +81,9 @@ EOT;
 								
 EOT;
 					$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
+					$pathinfo = pathinfo("$filepath");
+					$ext = $pathinfo['extension'];
 					if (strlen($row['oldfilename']) > 18 ){
-						$pathinfo = pathinfo("$filepath");
-						$ext = $pathinfo['extension'];
 						$shortened = substr($row['oldfilename'], 0, 15);
 						$filename = $shortened."...".$ext;
 					
@@ -102,7 +102,7 @@ EOT;
         	    	echo "<table>";
 					echo "<a href=/'$filepath'>".$filename."</a> <span> (".$height."x".$width.") $sizekb KB</span>";
 					echo "<span>".$imagesize."</span>";
-					if($row['isVideo'] == "1"){
+					if($ext == "mp4" || $ext == "mov" || $ext == "ogg" || $ext == "m4v"){
 						echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
 					}
 					else {
@@ -164,7 +164,7 @@ EOT;
 							}
 							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
-							if($row["isVideo"] == "1"){
+							if($ext == ".mp4" || $ext == ".mov" || $ext == ".ogg" || $ext == ".m4v"){
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
 								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";	
 							}

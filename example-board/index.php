@@ -87,12 +87,13 @@ EOT;
 						$isPinned = $row1['isPinned'];
 						$sql2 = "SELECT * FROM POSTS WHERE id = $BumpID";
 						$getPosts = $conn->query($sql2);
+						
 						if ($getPosts->num_rows > 0){
 							while($row = $getPosts->fetch_assoc()){
-								$filepath = $config['uploadDir']."/".$row['filename'];
+								$filepath = "../".$config['uploadDir']."/".$row['filename'];
+								$pathinfo = pathinfo("$filepath");
+								$ext = $pathinfo['extension'];
 								if (strlen($row['oldfilename']) > 18 ){
-									$pathinfo = pathinfo("$filepath");
-									$ext = $pathinfo['extension'];
 									$shortened = substr($row['oldfilename'], 0, 15);
 		 							$filename = $shortened."...".$ext;
 								}
@@ -133,7 +134,7 @@ EOT;
 							}
 							if(!is_null($row["filename"])){
 								echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB $pinned</span></td></tr>";
-								if($row['isVideo'] == "1"){
+								if($ext == "mp4" || $ext == "mov" || $ext == "ogg" || $ext == "m4v"){
 									echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><video controls class='post'> <source src='$filepath'></video></a></td>";
 								}
 								else {
