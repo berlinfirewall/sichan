@@ -118,10 +118,11 @@ EOT;
 							$id = $row['id'];
 
 							$getReplies = "SELECT * FROM POSTS WHERE reply='$id'";
-							$link = mysql_connect($config['host'], $config['user'], $config['password']);
-							mysql_select_db($boardCFG['db-'.$board], $link);
-							$result2 = mysql_query($getReplies, $link) or die(mysql_error());
-							$num_replies = mysql_num_rows($result2);
+							$link = mysqli_connect($config['host'], $config['user'], $config['password'], $boardCFG['db-'.$board]);
+							if (mysqli_connect_errno()){
+								  echo "Failed to connect to MySQL: " . mysqli_connect_error();
+							}
+							$num_replies = mysqli_num_rows(mysqli_query($link, $getReplies));
 
 							echo "<br>";
 							echo "<div class='postfront' id='".$id."'>";
