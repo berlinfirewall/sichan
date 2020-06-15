@@ -11,12 +11,13 @@ if(!isset ($_GET["id"])){
     echo("invalid url");
 }
 
-else{
+else 
+{
     $conn = new mysqli($boardCFG['dbhost-'.$board], $boardCFG['dbuser-'.$board], $boardCFG['dbpassword-'.$board], $boardCFG['db-'.$board]);
     $sql = "SELECT * FROM POSTS WHERE id='$thread'";
-	  $result = $conn->query($sql);
-    echo "<html>";
-    echo "<head>";
+	$result = $conn->query($sql);
+        echo "<html>";	
+        echo "<head>";	
 		echo "<title>".$config['boardName']."</title>";
 		echo <<<EOT
 				<script>
@@ -25,7 +26,7 @@ else{
 						if (theme == "default"){
 							document.getElementById('theme_css').href = '/default.css';
 						};
-						if (theme == "dark"){
+						if (theme == "dark"){ 
     						document.getElementById('theme_css').href = '/dark.css';
 						};
 					}
@@ -33,20 +34,20 @@ else{
 
 				<link rel="stylesheet" type="text/css" href="/default.css" id="theme_css">
 EOT;
-    if ($result->num_rows > 0){
-    	while($row = $result->fetch_assoc()){
-    		echo "<meta property='og:title' content='".$boardCFG['boardTagline-'.$board]."'/>";
-    		echo "<meta property='og:image' content='".$config['uploadDir']."/".$row['filename']."'/>";
-    		echo "<meta property='og:description' content='".$row['comment']."'/>";
+if ($result->num_rows > 0){
+	while($row = $result->fetch_assoc()){
+		echo "<meta property='og:title' content='".$boardCFG['boardinfo-'.$board]."'/>";
+		echo "<meta property='og:image' content='https://".$config['url']."/".$config['uploadDir']."/".$row['filename']."'/>";
+		echo "<meta property='og:description' content='".$row['comment']."'/>";
+	
 
 
-
-    echo <<<EOT
-    			</head>
-    			<body>
-    				<table style="width:100%;height:100%;"cellspacing="0" cellpadding=4">
-    					<tbody>
-    						<tr style="width:100%">
+echo <<<EOT
+			</head>				
+			<body>
+				<table style="width:100%;height:100%;"cellspacing="0" cellpadding=4">
+					<tbody>
+						<tr style="width:100%">
 EOT;
 		if ($config['isImage'] = 1){
 			$images = $config['image'];
@@ -71,13 +72,13 @@ EOT;
 		echo <<<EOT
 												<tr><td><span class="postField">Name:</span></td><td><input name="username" value="Anonymous" type="text"></td></tr>
 												<td><span class="postField">Reply:</span></td><td><textarea rows="5" cols="40" name="comment"></textarea></td></tr>
-
+												
 												<tr><td><input type="submit" value="Submit" name="submit"></td></tr>
 											</form>
 											</tr>
 											</table>
-										</div>
-
+										</div>							
+								
 EOT;
 					$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
 					$pathinfo = pathinfo("$filepath");
@@ -85,7 +86,7 @@ EOT;
 					if (strlen($row['oldfilename']) > 18 ){
 						$shortened = substr($row['oldfilename'], 0, 15);
 						$filename = $shortened."...".$ext;
-
+					
 					}
 					else {
 						$filename = $row['oldfilename'];
@@ -112,7 +113,7 @@ EOT;
 							$opusername = "Anonymous";
 					}
 					if($row['name']){
-							$opusername = $row['name'];
+							$opusername = $row['name'];			
 					}
 					$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 					if(preg_match($reg_exUrl, $row["comment"], $url)) {
@@ -132,7 +133,7 @@ EOT;
 					if ($row['country'] == null){
          				$country = "xx";
             		}
-
+            
             		if ($row['country'] != null){
                 		$country = $row['country'];
             		}
@@ -144,14 +145,14 @@ EOT;
 					echo "</table>";
 					echo "</div>";
 				}
-
+				
 				$sql2 = "SELECT * FROM POSTS WHERE reply='$thread'";
          	    $result2 = $conn->query($sql2);
             	if ($result2->num_rows > 0){
 					while($row = $result2->fetch_assoc()){
 						echo "<br>";
 						echo "<div class='postreply' id='".$row['id']."'>";
-						echo "<table>";
+						echo "<table>";	
 						if(!is_null($row["filename"])){
 							$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
 							$filename = $row['oldfilename'];
@@ -165,14 +166,14 @@ EOT;
 							$sizekb = round($size/1024);
 							if($ext == ".mp4" || $ext == ".mov" || $ext == ".ogg" || $ext == ".m4v"){
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
-								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";
+								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";	
 							}
 							else {
 								$imageinfo = getimagesize('../'.$config['uploadDir']."/".$row['filename']);
 								$width=$imageinfo[0];
 								$height=$imageinfo[1];
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> (".$width."x".$height.") $sizekb KB </span></td></tr>";
-								echo "<tr><td><a href=".$filepath."><img class='post' src=".$filepath."></a></td>";
+								echo "<tr><td><a href=".$filepath."><img class='post' src=".$filepath."></a></td>";	
 							}
 						}
 						echo "<td class='info'>";
@@ -180,19 +181,19 @@ EOT;
 							$username = "Anonymous";
 						}
 						if($row['name']){
-							$username = $row['name'];
+							$username = $row['name'];			
 						}
-
+					
 					 	if ($row['country'] == null){
          					$country = "xx";
             			}
-
+            
             			if ($row['country'] != null){
                 			$country = $row['country'];
             			}
 
 						$flagCode = "<img src=/img/flags/$country.gif></img>";
-
+						
 						$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 						if(preg_match($reg_exUrl, $row["comment"], $url)) {
 							$res = preg_replace("/(\x3c(br)\x3e)/", "", $url[0]);
@@ -232,7 +233,7 @@ echo <<<EOT
 					<select id="themeSwitch">
   						<option value="default">Default</option>
   						<option value="dark">Dark</option>
-					</select>
+					</select> 
 					<input type="submit" id="themeSub" value="Apply Theme"></input>
 					<script>
 						document.getElementById("themeSub").onclick = function(){
@@ -244,7 +245,7 @@ echo <<<EOT
 						}
 					</script>
 					</div>
-				</body>
+				</body>	
 			</html>
 EOT;
 
