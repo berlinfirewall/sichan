@@ -1,6 +1,5 @@
 <?php
 $board = explode('/', $_SERVER['REQUEST_URI'])[1];
-$boardCFG = parse_ini_file('../conf/config-boards.ini');
 $config = parse_ini_file('../conf/config.ini');
 $thread = ($_GET["id"]);
 $uploads = $config['uploadDir'];
@@ -13,7 +12,7 @@ if(!isset ($_GET["id"])){
 
 else 
 {
-    $conn = new mysqli($boardCFG['dbhost-'.$board], $boardCFG['dbuser-'.$board], $boardCFG['dbpassword-'.$board], $boardCFG['db-'.$board]);
+    $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
     $sql = "SELECT * FROM POSTS WHERE id='$thread'";
 	$result = $conn->query($sql);
         echo "<html>";	
@@ -36,7 +35,7 @@ else
 EOT;
 if ($result->num_rows > 0){
 	while($row = $result->fetch_assoc()){
-		echo "<meta property='og:title' content='".$boardCFG['boardinfo-'.$board]."'/>";
+		echo "<meta property='og:title' content='".$config['boardTitle'.$board]."'/>";
 		echo "<meta property='og:image' content='https://".$config['url']."/".$config['uploadDir']."/".$row['filename']."'/>";
 		echo "<meta property='og:description' content='".$row['comment']."'/>";
 	

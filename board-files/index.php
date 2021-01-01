@@ -1,8 +1,7 @@
 <?php
 	$board = explode('/', $_SERVER['REQUEST_URI'])[1];
 	$config = parse_ini_file('../conf/config.ini');
-  	$boardCFG = parse_ini_file('../conf/config-boards.ini');
-	$uploads = $config['uploadDir'];
+  	$uploads = $config['uploadDir'];
 	$headerDir = $config['headerDir'];
     if (!isset($_GET['page'])){
 	  		header('Location: http://'.$config['url'].'/'.$board.'/index.php?page=1');
@@ -11,12 +10,12 @@
 			$sql = "SELECT * FROM BUMP WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM BUMP ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
 	}
 
-  	$conn = new mysqli($boardCFG['dbhost-'.$board], $boardCFG['dbuser-'.$board], $boardCFG['dbpassword-'.$board], $boardCFG['db-'.$board]);
+  	$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 	$result = $conn->query($sql);
 
  		echo "<html>";
-        echo "<head>";
-		echo "<title>".$boardCFG['boardTagline-'.$board]."</title>";
+	        echo "<head>";
+		echo "<title>".$config['boardTitle-'.strtoupper($board)]."</title>";
 		echo <<<EOT
 			<script>
 			window.onload = function(){
@@ -48,7 +47,7 @@ EOT;
 		if ($config['isImage'] == 1){
 			$images = $config['image'];
 			echo "<a href='http://".$config['url']."'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
-			echo "<h2 class='frontheader'>".$boardCFG['boardTagline-'.$board]."</h4>";
+			echo "<h2 class='frontheader'>".$config['boardTitle-'.strtoupper($board)]."</h4>";
 		}
 		if ($config['isImage'] == 0){
 			echo "<h1 class='header'>".$config['boardName']."</h1>";
@@ -118,7 +117,7 @@ EOT;
 							$id = $row['id'];
 
 							$getReplies = "SELECT * FROM POSTS WHERE reply='$id'";
-							$link = mysqli_connect($config['host'], $config['user'], $config['password'], $boardCFG['db-'.$board]);
+							$link = mysqli_connect($config['host'], $config['user'], $config['password'], $config['database']);
 							if (mysqli_connect_errno()){
 								  echo "Failed to connect to MySQL: " . mysqli_connect_error();
 							}
