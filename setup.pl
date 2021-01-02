@@ -139,7 +139,7 @@ for(my $i=1; $i<=$numBoards; $i++){ #create board tables
 	print FH "boardTitle-$boardName=$title\n";
 	close(FH);
         $dbh->do("CREATE TABLE `$db`.`$boardName-POSTS` (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, comment varchar($maxWords), name varchar(32), time int, filename varchar(32), oldFilename varchar(255), reply int, ip varchar(15), country varchar(2), adminPost int)");
-	$dbh->do("CREATE TABLE `$db`.`$boardName-BUMP` (id int PRIMARY KEY, number int, isPinned int)");
+	$dbh->do("CREATE TABLE `$db`.`$boardName-BUMP` (id int, number int PRIMARY KEY, isPinned int)");
 	print "Created board $boardName\n";
 	$boardName = lc($boardName);
 	print `mkdir -v $boardName && cp -v board-files/* $boardName/`;
@@ -149,7 +149,7 @@ for(my $i=1; $i<=$numBoards; $i++){ #create board tables
 print "Creating bans table\n";
 $dbh->do("CREATE TABLE `$db`.`BANS` (ip varchar(15), reason varchar(1024))");
 print "Granting Permissions\n";
-$dbh->do("GRANT SELECT, INSERT ON `$db`.* TO `$boardUser`@`localhost`");
+$dbh->do("GRANT SELECT, INSERT, UPDATE ON `$db`.* TO `$boardUser`@`localhost`");
 
 print "Installing Composer\n";
 print `curl -sS https://getcomposer.org/installer | php`;
