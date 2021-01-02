@@ -3,7 +3,6 @@ require_once 'vendor/autoload.php';
 use GeoIp2\Database\Reader;
 
 $time = time();
-date_default_timezone_set("America/Los Angeles");
 $config = parse_ini_file('conf/config.ini');
 
 $target_dir = $config['uploadDir'];
@@ -30,11 +29,7 @@ $comment = nl2br(str_replace("\"", "&#34;", $comment), false);
 $comment = strip_tags($comment);
 $comment = $conn->real_escape_string($comment);
 
-<<<<<<< HEAD
 $check = $conn->query("SELECT * FROM `BANS` WHERE ip = '$ip'");
-=======
-$check = $conn->query("SELECT * FROM BANS WHERE ip = '$ip'");
->>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
 $banned = $check->num_rows;
 
 if ($banned == 1){
@@ -47,11 +42,7 @@ if ($banned == 1){
 
 if (isset($_COOKIE["isBanned"])){
     if ($banned == 0){
-<<<<<<< HEAD
         $conn->query("INSERT INTO `BANS` (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
-=======
-        $conn->query("INSERT INTO BANS (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
->>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
         $conn->close();
         echo "Nice Try";
     }
@@ -100,25 +91,17 @@ if ($uploadOk == 0) {
 else {
     $temp = explode(".", $_FILES["image"]["name"]);
     $newfilename = round(microtime(true)) . '.' . end($temp);
-    $countryCode = $record->country->isoCode;
-    $country = strtolower($countryCode);
-    $userID = substr(str_shuffle(str_repeat($x="0123456789abcdefghijklmnopqurstuvwxyzçşəıöüABCDEFGHIJKLMNOPQURSTUVWXYZÇŞƏİÖÜ", ceil(8/strlen($x)) )),1,8);
+    $country = strtolower($record->country->isoCode);
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) { 
         $oldfilename = $_FILES["image"]["name"];
         echo "<script type='text/javascript'> localStorage.setItem('userID', '".$userID."'); </script>";
-<<<<<<< HEAD
-        $sql = $conn->query("INSERT INTO `$board-POSTS` (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID', '0')") or die(mysqli_error($conn));
+        $sql = $conn->query("INSERT INTO `".strtoupper($board)."-POSTS` (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '0')") or die(mysqli_error($conn));
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-        $sql2 = "SELECT id FROM `$board-POSTS` WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
-=======
-        $sql = $conn->query("INSERT INTO $board-POSTS (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID', '0')") or die(mysqli_error($conn));
-        echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-        $sql2 = "SELECT id FROM $board-POSTS WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
->>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
+        $sql2 = "SELECT id FROM `".strtoupper($board)."-POSTS` WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
         $getID = $conn->query($sql2) or die(mysqli_error($conn));
         while ($row = $getID->fetch_assoc()){
             $id = $row['id'];
-            $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$id&action=new&board=$board");
+            $bump = file_get_contents("http://".$config['url']."/bump.pl?id=$id&action=new&board=$board");
             print "<p>".$bump."<p><br>";
         }
 

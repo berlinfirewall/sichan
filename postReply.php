@@ -3,7 +3,6 @@ require_once 'vendor/autoload.php';
 use GeoIp2\Database\Reader;
 
 $time = time();
-date_default_timezone_set("America/Los Angeles");
 $config = parse_ini_file('conf/config.ini');
 
 $target_dir = $config['uploadDir'];
@@ -20,6 +19,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $board = $_POST['board'];
 $reader = new Reader($config['IPGeo']);
 $record = $reader->country($ip);
+$country = strtolower($record->country->isoCode);
 
 $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 
@@ -31,7 +31,7 @@ $comment = nl2br(str_replace("\"", "&#34;", $comment), false);
 $comment = strip_tags($comment);
 $comment = $conn->real_escape_string($comment);
 
-$check = $connGlobal->query("SELECT * FROM BANS WHERE ip = '$ip'");
+$check = $conn->query("SELECT * FROM BANS WHERE ip = '$ip'");
 $banned = $check->num_rows;
 
 if ($banned == 1){
@@ -51,10 +51,6 @@ if (isset($_COOKIE["isBanned"])){
     exit();
 }
 
-if (!in_array($fileType, $acceptableFiles)){
-    echo "File type .$fileType invalid.";
-}
-
 else {
     if ($_FILES['image']['error'] == 4) {
         if ($reply == 0) {
@@ -64,20 +60,19 @@ else {
             echo "<p>Please supply a comment.</p>\n";
             $conn->close();
         }
-<<<<<<< HEAD
-        $sql = "INSERT INTO `$board-POSTS` (time, name, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country', '0')";
-=======
-        $sql = "INSERT INTO $board-POSTS (time, name, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country', '0')";
->>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
+        $sql = "INSERT INTO `".strtoupper($board)."-POSTS` (time, name, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country', '0')";
         $conn->query($sql) or die(mysqli_error($conn));
-        $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump&board=$board");
+        $bump = file_get_contents("http://".$config['url']."/bump.pl?id=$thread&action=bump&board=$board");
         header ("location: http://" . $config['url']."/".$board."/thread.php?id=$thread");
         $conn->close();
-        $connGlobal->close();
     }
 
     if ($_FILES['image']['error'] != 4){
+        
         if(isset($_POST["submit"])) {
+            if (!in_array($fileType, $acceptableFiles)){
+                echo "File type .$fileType invalid.";
+            }
             if($fileType == "mp4" || $fileType == "webm" || $fileType == "ogg" || $fileType == "mov"){
                 $uploadOk = 1;
             }
@@ -107,21 +102,15 @@ else {
             echo "Sorry, your file was not uploaded.";
         }
         else {
-            $countryCode = $record->country->isoCode;
-            $country = strtolower($countryCode);
             $temp = explode(".", $_FILES["image"]["name"]);
             $newfilename = round(microtime(true)) . '.' . end($temp);
 
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
-                $oldfilename = $_FILES["image"]["name"];
-<<<<<<< HEAD
-                $sql = ("INSERT INTO `$board-POSTS` (time, name, filename, oldfilename, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip', '$country', '0')");
-=======
-                $sql = ("INSERT INTO $board-POSTS (time, name, filename, oldfilename, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip', '$country', '0')");
->>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
+                $oldFilename = $_FILES["image"]["name"];
+                $sql = ("INSERT INTO `".strtoupper($board)."-POSTS` (time, name, filename, oldFilename, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldFilename', '$comment', '$thread', '$ip', '$country', '0')");
                 $conn->query($sql) or die(mysqli_error($conn));
                 $conn->close();
-                $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump&board=$board");
+                $bump = file_get_contents("http://".$config['url']."/bump.pl?id=$thread&action=bump&board=$board");
                 header ("location: http://" . $config['url']."/".$board."/thread.php?id=$thread");
             }
             else {
