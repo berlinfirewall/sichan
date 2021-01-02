@@ -136,7 +136,7 @@ for(my $i=1; $i<=$numBoards; $i++){ #create board tables
 	chomp(my $title = <STDIN>);
 	open(FH, '>>', 'conf/config.ini') or die $!;
 	print FH "[board-$boardName]\n";
-	print FH "boardTitle-$boardName=$title\n\n";
+	print FH "boardTitle-$boardName=$title\n";
 	close(FH);
         $dbh->do("CREATE TABLE `$db`.`$boardName-POSTS` (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, comment varchar($maxWords), name varchar(32), time int, filename varchar(32), oldFilename varchar(255), reply int, ip varchar(15), country varchar(2), adminPost int)");
 	$dbh->do("CREATE TABLE `$db`.`$boardName-BUMP` (id int PRIMARY KEY, number int, isPinned int)");
@@ -156,7 +156,11 @@ print `curl -sS https://getcomposer.org/installer | php`;
 print "Installing GeoIP2 module";
 print `php composer.phar require geoip2/geoip2:~2.0`;
 
+print `mkdir -v $uploadDir`;
+print `chmod 766 -v $uploadDir`;
+
 print "Setup Complete\n";
 print "The only step left is to now download the GeoLite2-Country mmdb file from https://dev.maxmind.com/geoip/geoip2/geolite2/, and set the IPGeo field in the config.ini file to the directory of that .mmdb file. After that, everything should work!\n";
+print "You also can (and should) now delete this file.";
 print "Good Luck with your new Imageboard!\n";
 $dbh->disconnect;

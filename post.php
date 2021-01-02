@@ -1,20 +1,18 @@
-
 <?php
 require_once 'vendor/autoload.php';
 use GeoIp2\Database\Reader;
 
-$config = parse_ini_file('conf/config.ini');
-$boardCFG = parse_ini_file('conf/config-boards.ini');
-date_default_timezone_set("America/Los Angeles");
 $time = time();
+date_default_timezone_set("America/Los Angeles");
+$config = parse_ini_file('conf/config.ini');
 
 $target_dir = $config['uploadDir'];
 $target_file = $target_dir . basename($_FILES["image"]["name"]);
 $uploadOk = 1;
-$isVideo = 0;
-$imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
-$comment0 = nl2br(str_replace("'", "&#39;", $_POST['comment']), false);
-$comment1 = nl2br(str_replace("\"", "&#34;", $_POST['comment']), false);
+
+$acceptableFiles = array('jpg', 'png', 'jpeg', 'gif', 'mov', 'ogg', 'mp4', 'webm');
+$fileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
+
 $username = $_POST['username'];
 $board = $_POST['board'];
 $ip = $_SERVER['REMOTE_ADDR'];
@@ -22,44 +20,47 @@ $userID = $_POST="userID";
 $reader = new Reader($config['IPGeo']);
 $record = $reader->country($ip);
 
-$conn = new mysqli($boardCFG['dbhost-'.$board], $boardCFG['dbuser-'.$board], $boardCFG['dbpassword-'.$board], $boardCFG['db-'.$board]);
-$connGlobal = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
-$comment = $conn->real_escape_string($comment1);
-$check = $connGlobal->query("SELECT * FROM BANS WHERE ip = '$ip'");
-$banned = $check->num_rows;
-
-if ($connGlobal->connect_error) {
-    die('Database connection failed: '  . $connGlobal->connect_error);
-}
+$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 if ($conn->connect_error) {
     die('Database connection failed: '  . $conn->connect_error);
 }
+
+$comment = nl2br(str_replace("'", "&#39;", $_POST['comment']), false);
+$comment = nl2br(str_replace("\"", "&#34;", $comment), false);
+$comment = strip_tags($comment);
+$comment = $conn->real_escape_string($comment);
+
+$check = $conn->query("SELECT * FROM `BANS` WHERE ip = '$ip'");
+$banned = $check->num_rows;
+
 if ($banned == 1){
     setcookie("isBanned", "True", time() + ((86400 * 30)), "/");
     echo "Sorry, you are banned!";
     $uploadOk = 0;
     $conn->close();
-    $connGlobal->close();
     exit();
 }
 
 if (isset($_COOKIE["isBanned"])){
     if ($banned == 0){
-        $connGlobal->query("INSERT INTO BANS (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
+        $conn->query("INSERT INTO `BANS` (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
         $conn->close();
-        $connGlobal->close();
         echo "Nice Try";
     }
     exit();
 }
 
+if (!in_array($fileType, $acceptableFiles)){
+    echo "File type .$fileType invalid.";
+}
+
 if(isset($_POST["submit"])) {
-    if($imageFileType == "mp4" || $imageFileType == "webm" || $imageFileType == "ogg" || $imageFileType == "mov"){
+    if($fileType == "mp4" || $fileType == "webm" || $fileType == "ogg" || $fileType == "mov"){
         echo "File is a video.";
         $uploadOk = 1;
         $isVideo = 1;
     }
-    if($imageFileType == "jpg" || $imageFileType == "png" || $imageFileType == "jpeg" || $imageFileType == "gif" ) {
+    if($fileType == "jpg" || $fileType == "png" || $fileType == "jpeg" || $fileType == "gif" ) {
         $check = getimagesize($_FILES["image"]["tmp_name"]);
         if($check !== false) {
             echo "File is an image - " . $check["mime"] . ".";
@@ -78,7 +79,7 @@ if(isset($_POST["submit"])) {
         exit();
     }
 
-    if ($_FILES["image"]["size"] > 40000000) {
+    if ($_FILES["image"]["size"] > 30000000) {
         echo "Sorry, your file is too large.";
         $uploadOk = 0;
         exit();
@@ -97,9 +98,9 @@ else {
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) { 
         $oldfilename = $_FILES["image"]["name"];
         echo "<script type='text/javascript'> localStorage.setItem('userID', '".$userID."'); </script>";
-        $sql = $conn->query("INSERT INTO POSTS (time, name, filename, oldfilename, comment, ip, country, isVideo, userID) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID')") or die(mysqli_error($conn));
+        $sql = $conn->query("INSERT INTO `$board-POSTS` (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID', '0')") or die(mysqli_error($conn));
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
-        $sql2 = "SELECT id FROM POSTS WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
+        $sql2 = "SELECT id FROM `$board-POSTS` WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
         $getID = $conn->query($sql2) or die(mysqli_error($conn));
         while ($row = $getID->fetch_assoc()){
             $id = $row['id'];
@@ -108,7 +109,6 @@ else {
         }
 
         $conn->close();
-        $connGlobal->close();
         sleep(1);
         echo "<script type='text/javascript'>";
         echo "window.location.href = 'https://".$config['url']."/".$board."/thread.php?id=".$id."'";          
@@ -116,7 +116,6 @@ else {
     } else {
         echo "Sorry, there was an error uploading your file.";
         $conn->close();
-        $connGlobal->close();
     }
 }
 ?>
