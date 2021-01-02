@@ -87,11 +87,11 @@ chomp(my $userPasswd = <STDIN>);
 
 if ($userPasswd eq ""){
 	my @randomString;
-	my @chars = ('A'..'Z', 'a'..'z', '0'..'9');
+	my @chars = ('A'..'Z', 'a'..'z', '0'..'9', '!', '?', '<', '>');
 	for (my $i=0; $i<=15; $i++){
      		push(@randomString, ($chars[rand @chars]));
 	}
-$userPasswd = join("",@randomString);
+$userPasswd = (join("",@randomString)).'!';
 print "USER PASSWORD IS $userPasswd\n";
 }
 
@@ -107,7 +107,7 @@ open(FH, '>>', 'conf/config.ini') or die $!;
 print FH "[database]\n";
 print FH "database=$db\n";
 print FH "user=$boardUser\n";
-print FH "password=$userPasswd\n";
+print FH "password=\"$userPasswd\"\n";
 print FH "host=$host\n";
 print FH "IPGeo=ADD IT HERE\n\n";
 print FH "[header]\n";
@@ -136,7 +136,7 @@ for(my $i=1; $i<=$numBoards; $i++){ #create board tables
 	chomp(my $title = <STDIN>);
 	open(FH, '>>', 'conf/config.ini') or die $!;
 	print FH "[board-$boardName]\n";
-	print FH "boardTitle-$boardName=$title\n";
+	print FH "boardTitle-$boardName=$title\n\n";
 	close(FH);
         $dbh->do("CREATE TABLE `$db`.`$boardName-POSTS` (id int NOT NULL AUTO_INCREMENT PRIMARY KEY, comment varchar($maxWords), name varchar(32), time int, filename varchar(32), oldFilename varchar(255), reply int, ip varchar(15), country varchar(2), adminPost int)");
 	$dbh->do("CREATE TABLE `$db`.`$boardName-BUMP` (id int PRIMARY KEY, number int, isPinned int)");
