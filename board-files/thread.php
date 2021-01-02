@@ -13,7 +13,7 @@ if(!isset ($_GET["id"])){
 else 
 {
     $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
-    $sql = "SELECT * FROM `$board-POSTS` WHERE id='$thread'";
+    $sql = "SELECT * FROM `".strtoupper($board)."-POSTS` WHERE id='$thread'";
 	$result = $conn->query($sql);
         echo "<html>";	
         echo "<head>";	
@@ -48,12 +48,13 @@ echo <<<EOT
 					<tbody>
 						<tr style="width:100%">
 EOT;
-		if ($config['isImage'] = 1){
+		if ($config['isImage'] == 1){
 			$images = $config['image'];
 			echo "<a href='http://".$config['url']."/".$board."/'><img class='header' src='".$headerDir."/". $images[array_rand($images, 1)]."'></a>";
 		}
 		else{
-			echo "<h1 class='header'>".$config['boardName']."</h1>";
+			echo "<a class='titleLink' href='http://".$config['url']."/".$board."/'><h1 class='header'>".$config['siteName']."</h1></a>";
+			echo "<h2 class='frontheader'>".$config['boardTitle-'.strtoupper($board)]."</h4>";
 		}
 		echo <<<EOT
 							<hr>
@@ -82,13 +83,13 @@ EOT;
 					$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
 					$pathinfo = pathinfo("$filepath");
 					$ext = $pathinfo['extension'];
-					if (strlen($row['oldfilename']) > 18 ){
-						$shortened = substr($row['oldfilename'], 0, 15);
+					if (strlen($row['oldFilename']) > 18 ){
+						$shortened = substr($row['oldFilename'], 0, 15);
 						$filename = $shortened."...".$ext;
 					
 					}
 					else {
-						$filename = $row['oldfilename'];
+						$filename = $row['oldFilename'];
 					}
 
 					$imageinfo = getimagesize('../'.$config['uploadDir']."/".$row['filename']);
@@ -108,12 +109,11 @@ EOT;
 						echo "<td style='vertical-align:top; font-size: 10pt;'><a href='$filepath'><img src='$filepath' class='post'></a></td>";
 					}
 					echo "<td style='vertical-align:top; font-size: 10pt;' id='post' >No.". $row["id"] . " ";
+					$opusername = $row['name'];	
 					if(!$row["name"]){
 							$opusername = "Anonymous";
 					}
-					if($row['name']){
-							$opusername = $row['name'];			
-					}
+
 					$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
 					if(preg_match($reg_exUrl, $row["comment"], $url)) {
 						$res = preg_replace("/(\x3c(br)\x3e)/", "", $url[0]);
@@ -129,13 +129,11 @@ EOT;
 						echo "<span class='name'>".$opusername."</span> ";
 					}
 					echo date('m/d/Y h:m:s', $row["time"]);
+					$country = $row['country'];
 					if ($row['country'] == null){
          				$country = "xx";
             		}
-            
-            		if ($row['country'] != null){
-                		$country = $row['country'];
-            		}
+
 					print " <img src=/img/flags/".$country.".gif></img> ";
 					$comment2 = preg_replace("/(>)(>)[\d+]+/", '<span class="text"><a id="reply" style="color:#FF0000;margin:0;" href="#">$0</a></span>', $comment);
 					$comment3 = preg_replace("/^\s*[\x3e].*$/m", '<span class="quote">$0</span>', $comment2);
@@ -145,7 +143,7 @@ EOT;
 					echo "</div>";
 				}
 				
-				$sql2 = "SELECT * FROM `$board-POSTS` WHERE reply='$thread'";
+				$sql2 = "SELECT * FROM `".strtoupper($board)."-POSTS` WHERE reply='$thread'";
          	    $result2 = $conn->query($sql2);
             	if ($result2->num_rows > 0){
 					while($row = $result2->fetch_assoc()){
@@ -154,16 +152,16 @@ EOT;
 						echo "<table>";	
 						if(!is_null($row["filename"])){
 							$filepath = "http://".$config['url'].'/'.$config['uploadDir']."/".$row['filename'];
-							$filename = $row['oldfilename'];
+							$filename = $row['oldFilename'];
 							$pathinfo = pathinfo("$filepath");
 							$ext = $pathinfo['extension'];
-							if (strlen($row['oldfilename']) > 18 ){
-								$shortened = substr($row['oldfilename'], 0, 15);
+							if (strlen($row['oldFilename']) > 18 ){
+								$shortened = substr($row['oldFilename'], 0, 15);
 								$filename = $shortened."...".$ext;
 							}
 							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
-							if($ext == ".mp4" || $ext == ".mov" || $ext == ".ogg" || $ext == ".m4v"){
+							if($ext == "mp4" || $ext == "mov" || $ext == "ogg" || $ext == "m4v"){
 								echo "<tr><td><span class='imagedesc'><a href='$filepath'>".$filename."</a> $sizekb KB </span></td></tr>";
 								echo "<tr><td><video controls class='post'><source src=".$filepath."></video></td>";	
 							}
@@ -176,20 +174,15 @@ EOT;
 							}
 						}
 						echo "<td class='info'>";
+						$username = $row['name'];
 						if(!$row["name"]){
 							$username = "Anonymous";
 						}
-						if($row['name']){
-							$username = $row['name'];			
-						}
-					
-					 	if ($row['country'] == null){
-         					$country = "xx";
-            			}
             
-            			if ($row['country'] != null){
-                			$country = $row['country'];
-            			}
+                		$country = $row['country'];
+						if (!$row['country']){
+							$country = "xx";
+					   	}
 
 						$flagCode = "<img src=/img/flags/$country.gif></img>";
 						

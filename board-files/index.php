@@ -6,9 +6,7 @@
     if (!isset($_GET['page'])){
 	  		header('Location: http://'.$config['url'].'/'.$board.'/index.php?page=1');
 	}
-	if ($_GET['page'] != null) {
-			$sql = "SELECT * FROM `$board-BUMP` WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM `$board-BUMP` ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
-	}
+	$sql = "SELECT * FROM `".strtoupper($board)."-BUMP` WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM `".strtoupper($board)."-BUMP` ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
 
   	$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
 	$result = $conn->query($sql);
@@ -50,7 +48,8 @@ EOT;
 			echo "<h2 class='frontheader'>".$config['boardTitle-'.strtoupper($board)]."</h4>";
 		}
 		if ($config['isImage'] == 0){
-			echo "<h1 class='header'>".$config['boardName']."</h1>";
+			echo "<a class='titleLink' href='http://".$config['url']."/".$board."/'><h1 class='header'>".$config['siteName']."</h1></a>";
+			echo "<h2 class='frontheader'>".$config['boardTitle-'.strtoupper($board)]."</h4>";
 		}
 		echo <<<EOT
 			<div>
@@ -84,7 +83,7 @@ EOT;
 				while($row1 = $result->fetch_assoc()){
 						$BumpID = $row1['id'];
 						$isPinned = $row1['isPinned'];
-						$sql2 = "SELECT * FROM `$board-POSTS` WHERE id = $BumpID";
+						$sql2 = "SELECT * FROM `".strtoupper($board)."-POSTS` WHERE id = $BumpID";
 						$getPosts = $conn->query($sql2);
 						
 						if ($getPosts->num_rows > 0){
@@ -92,31 +91,28 @@ EOT;
 								$filepath = "../".$config['uploadDir']."/".$row['filename'];
 								$pathinfo = pathinfo("$filepath");
 								$ext = $pathinfo['extension'];
-								if (strlen($row['oldfilename']) > 18 ){
-									$shortened = substr($row['oldfilename'], 0, 15);
+								if (strlen($row['oldFilename']) > 18 ){
+									$shortened = substr($row['oldFilename'], 0, 15);
 		 							$filename = $shortened."...".$ext;
 								}
 								else {
-									$filename = $row['oldfilename'];
+									$filename = $row['oldFilename'];
 								}
 							$imageinfo = getimagesize($filepath);
 							$width=$imageinfo[0];
 							$height=$imageinfo[1];
 							$size = filesize('../'.$config['uploadDir']."/".$row['filename']);
 							$sizekb = round($size/1024);
+							$country = $row['country'];
 							if ($row['country'] == null){
          						$country = "xx";
             				}
-            
-            				if ($row['country'] != null){
-                				$country = $row['country'];
-            				}
-							$flagCode = "<img src=/img/flags/".$country.".gif></img> ";
 
+							$flagCode = "<img src=/img/flags/".$country.".gif></img> ";
 
 							$id = $row['id'];
 
-							$getReplies = "SELECT * FROM `$board-POSTS` WHERE reply='$id'";
+							$getReplies = "SELECT * FROM `".strtoupper($board)."-POSTS` WHERE reply='$id'";
 							$link = mysqli_connect($config['host'], $config['user'], $config['password'], $config['database']);
 							if (mysqli_connect_errno()){
 								  echo "Failed to connect to MySQL: " . mysqli_connect_error();
@@ -129,9 +125,6 @@ EOT;
 							if($isPinned == "1"){
 								$pinned ="<img src=/img/sticky.gif></img>";
 							}
-							if($isPinned != "1"){
-								$pinned = "";
-							}
 							if(!is_null($row["filename"])){
 								echo "<tr><td><span class='fronttext'><a href='$filepath'>".$filename."</a>(".$width."x".$height.") $sizekb KB $pinned</span></td></tr>";
 								if($ext == "mp4" || $ext == "mov" || $ext == "ogg" || $ext == "m4v"){
@@ -142,11 +135,9 @@ EOT;
 								}
 							}
 							echo "<td class='info'>";
+							$username = $row['name'];	
 							if(!$row["name"]){
 								$username = "Anonymous";
-							}
-							if($row['name']){
-								$username = $row['name'];	
 							}
 							
 							$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
