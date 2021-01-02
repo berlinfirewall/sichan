@@ -30,7 +30,11 @@ $comment = nl2br(str_replace("\"", "&#34;", $comment), false);
 $comment = strip_tags($comment);
 $comment = $conn->real_escape_string($comment);
 
+<<<<<<< HEAD
 $check = $conn->query("SELECT * FROM `BANS` WHERE ip = '$ip'");
+=======
+$check = $conn->query("SELECT * FROM BANS WHERE ip = '$ip'");
+>>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
 $banned = $check->num_rows;
 
 if ($banned == 1){
@@ -43,7 +47,11 @@ if ($banned == 1){
 
 if (isset($_COOKIE["isBanned"])){
     if ($banned == 0){
+<<<<<<< HEAD
         $conn->query("INSERT INTO `BANS` (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
+=======
+        $conn->query("INSERT INTO BANS (ip, reason, isRangeban) VALUES ('$ip', 'AUTOMATIC: BAN EVASION', 0)") or die(mysqli_error($conn));
+>>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
         $conn->close();
         echo "Nice Try";
     }
@@ -98,9 +106,15 @@ else {
     if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir ."/". $newfilename)) { 
         $oldfilename = $_FILES["image"]["name"];
         echo "<script type='text/javascript'> localStorage.setItem('userID', '".$userID."'); </script>";
+<<<<<<< HEAD
         $sql = $conn->query("INSERT INTO `$board-POSTS` (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID', '0')") or die(mysqli_error($conn));
         echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
         $sql2 = "SELECT id FROM `$board-POSTS` WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
+=======
+        $sql = $conn->query("INSERT INTO $board-POSTS (time, name, filename, oldfilename, comment, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$ip', '$country', '$isVideo', '$userID', '0')") or die(mysqli_error($conn));
+        echo "The file ". basename( $_FILES["image"]["name"]). " has been uploaded.";
+        $sql2 = "SELECT id FROM $board-POSTS WHERE time = '$time' AND name = '$username' AND ip = '$ip'";
+>>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
         $getID = $conn->query($sql2) or die(mysqli_error($conn));
         while ($row = $getID->fetch_assoc()){
             $id = $row['id'];

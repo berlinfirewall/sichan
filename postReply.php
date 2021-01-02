@@ -64,7 +64,11 @@ else {
             echo "<p>Please supply a comment.</p>\n";
             $conn->close();
         }
+<<<<<<< HEAD
         $sql = "INSERT INTO `$board-POSTS` (time, name, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country', '0')";
+=======
+        $sql = "INSERT INTO $board-POSTS (time, name, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$comment', '$thread', '$ip', '$country', '0')";
+>>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
         $conn->query($sql) or die(mysqli_error($conn));
         $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump&board=$board");
         header ("location: http://" . $config['url']."/".$board."/thread.php?id=$thread");
@@ -110,7 +114,11 @@ else {
 
             if (move_uploaded_file($_FILES["image"]["tmp_name"], $target_dir  ."/". $newfilename)) {
                 $oldfilename = $_FILES["image"]["name"];
+<<<<<<< HEAD
                 $sql = ("INSERT INTO `$board-POSTS` (time, name, filename, oldfilename, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip', '$country', '0')");
+=======
+                $sql = ("INSERT INTO $board-POSTS (time, name, filename, oldfilename, comment, reply, ip, country, adminPost) VALUES ('$time', '$username', '$newfilename', '$oldfilename', '$comment', '$thread', '$ip', '$country', '0')");
+>>>>>>> 972930159ef4e9cb05024f4879fd421e70448241
                 $conn->query($sql) or die(mysqli_error($conn));
                 $conn->close();
                 $bump = file_get_contents("http://".$config['url']."/cgi-bin/bump.pl?id=$thread&action=bump&board=$board");
