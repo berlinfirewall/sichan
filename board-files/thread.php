@@ -13,7 +13,7 @@ if(!isset ($_GET["id"])){
 else 
 {
     $conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
-    $sql = "SELECT * FROM POSTS WHERE id='$thread'";
+    $sql = "SELECT * FROM `$board-POSTS` WHERE id='$thread'";
 	$result = $conn->query($sql);
         echo "<html>";	
         echo "<head>";	
@@ -145,7 +145,7 @@ EOT;
 					echo "</div>";
 				}
 				
-				$sql2 = "SELECT * FROM POSTS WHERE reply='$thread'";
+				$sql2 = "SELECT * FROM `$board-POSTS` WHERE reply='$thread'";
          	    $result2 = $conn->query($sql2);
             	if ($result2->num_rows > 0){
 					while($row = $result2->fetch_assoc()){

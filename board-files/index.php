@@ -7,7 +7,7 @@
 	  		header('Location: http://'.$config['url'].'/'.$board.'/index.php?page=1');
 	}
 	if ($_GET['page'] != null) {
-			$sql = "SELECT * FROM BUMP WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM BUMP ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
+			$sql = "SELECT * FROM `$board-BUMP` WHERE `isPinned`='1' UNION SELECT * FROM (SELECT * FROM `$board-BUMP` ORDER BY `number` ASC) AS posts LIMIT ".((15 * $_GET['page']) - 15).",15";
 	}
 
   	$conn = new mysqli($config['host'], $config['user'], $config['password'], $config['database']);
@@ -84,7 +84,7 @@ EOT;
 				while($row1 = $result->fetch_assoc()){
 						$BumpID = $row1['id'];
 						$isPinned = $row1['isPinned'];
-						$sql2 = "SELECT * FROM POSTS WHERE id = $BumpID";
+						$sql2 = "SELECT * FROM `$board-POSTS` WHERE id = $BumpID";
 						$getPosts = $conn->query($sql2);
 						
 						if ($getPosts->num_rows > 0){
@@ -116,7 +116,7 @@ EOT;
 
 							$id = $row['id'];
 
-							$getReplies = "SELECT * FROM POSTS WHERE reply='$id'";
+							$getReplies = "SELECT * FROM `$board-POSTS` WHERE reply='$id'";
 							$link = mysqli_connect($config['host'], $config['user'], $config['password'], $config['database']);
 							if (mysqli_connect_errno()){
 								  echo "Failed to connect to MySQL: " . mysqli_connect_error();
